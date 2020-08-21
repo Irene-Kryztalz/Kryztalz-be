@@ -2,6 +2,8 @@ import path from "path";
 import express from "express";
 import { json } from "body-parser";
 
+import userRoutes from "./routes/user";
+
 const app = express();
 
 app.use( ( req, res, next ) =>
@@ -22,9 +24,21 @@ app.get( "/favicon.ico", ( req, res ) =>
 } );
 
 
+app.use( "/user", userRoutes );
+
+app.use( ( req, res, next ) =>
+{
+    const err = new Error( "Not Found" );
+
+    err.statusCode = 404;
+
+    next( err );
+
+} );
+
+
 app.use( ( error, req, res, next ) =>
 {
-    console.log( error );
     const message = error.message;
     const status = error.statusCode || 500;
     const data = error.data;
@@ -33,7 +47,4 @@ app.use( ( error, req, res, next ) =>
 
 } );
 
-
-
 export default app;
-

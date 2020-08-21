@@ -1,4 +1,3 @@
-import http from "http";
 import { connect } from "mongoose";
 import { port, dbUrl } from "./config";
 import app from "./app";
@@ -14,8 +13,7 @@ connect( dbUrl, options )
     {
         console.log( "DB is connected" );
 
-        const server = http.createServer( app );
-        server.listen( port, () =>
+        app.listen( port, () =>
         {
             console.log( `Server is listening at port ${ port }` );
 
