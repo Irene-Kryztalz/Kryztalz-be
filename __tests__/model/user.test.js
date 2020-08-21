@@ -1,14 +1,39 @@
-import mongoose from "mongoose";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import setUpDB from "../setUpTests";
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import { compareSync } from "bcrypt";
+import User from "../../models/user";
+import setUpDB from "../../setUpTests";
 
-//describe user model/actions
+setUpDB();
+
+//describe user model
 /**
  * it should hash user pwd
  * it should generate email token
- * it should generate jwt on signin
- * it should ensure pwd and email match created User
  *
  */
+
+describe( "The User model", () =>
+{
+    it( "should hash a user password", async () =>
+    {
+        const user =
+        {
+            name: "testing",
+            password: "password",
+            email: "test@test.com"
+        };
+
+        const createdUser = await new User( user ).save();
+
+        expect( compareSync( user.password, createdUser.password ) ).toBe( true );
+        expect( user.name ).toEqual( createdUser.name );
+        expect( user.email ).toEqual( createdUser.email );
+        expect( createdUser.emailToken ).toBeTruthy();
+        expect( createdUser.emailTokenExpires ).toBeTruthy();
+        expect( createdUser.isValid ).not.toBeTruthy();
+
+
+    } );
+} );
 

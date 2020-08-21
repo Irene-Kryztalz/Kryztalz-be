@@ -1,5 +1,5 @@
 import { connection, connect } from "mongoose";
-import { dbUrlTest } from "../config";
+import { dbUrlTest } from "./config";
 
 const opts =
 {

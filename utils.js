@@ -19,8 +19,8 @@ const catchErr = ( err, next ) =>
  * Throw error for bad requests from client (status code 4XX)
  * @param {Object} errConfig Error message configuratons.
  * @param {string} errConfig.msg Error message.
- * @param {array} errConfig.data Data about the error.
- * @param {number} errConfig.statusCode Error status code, default is 422.
+ * @param {array} [errConfig.data = []] Data about the error.
+ * @param {number} [errConfig.statusCode = 422] Error status code, default is 422.
  */
 const throwErr = ( { msg, data = [], statusCode = 422 } ) =>
 {
@@ -40,7 +40,7 @@ const throwErr = ( { msg, data = [], statusCode = 422 } ) =>
 
 const generateRandomToken = ( len ) =>
 {
-    const chars = "0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM#*_$£<>";
+    const chars = "0123456789qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM$£";
 
     let token = "";
 

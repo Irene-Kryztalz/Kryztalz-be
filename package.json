@@ -8,6 +8,9 @@
     "test:watch": "jest --watch",
     "start": "nodemon --exec babel-node index"
   },
+  "jest": {
+    "testEnvironment": "node"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -15,6 +18,7 @@
     "@babel/core": "^7.11.1",
     "@babel/node": "^7.10.5",
     "@babel/preset-env": "^7.11.0",
+    "@sendgrid/mail": "^7.2.4",
     "@types/jest": "^26.0.10",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",

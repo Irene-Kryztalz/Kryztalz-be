@@ -50,8 +50,8 @@ const userSchema = new Schema(
                 }
             ],
         isVerified: Boolean,
-        token: String,
-        tokenExpires: Date,
+        emailToken: String,
+        emailTokenExpires: Date,
         isAdmin: Boolean
 
     }
@@ -70,9 +70,12 @@ userSchema.pre( 'save', async function ( next )
     if ( user.password && user.isModified( "password" ) )
     {
         const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
-        user.token = generateRandomToken( 12 );
-        user.tokenExpires = new Date( oneHr );
 
+        // @ts-ignore
+        user.emailToken = generateRandomToken( 12 );
+        user.emailTokenExpires = new Date( oneHr );
+
+        // @ts-ignore
         user.password = await hash( user.password, 12 );
 
     }
