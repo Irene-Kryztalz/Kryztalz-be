@@ -1,11 +1,4 @@
 import { connection, connect } from "mongoose";
-import { dbUrlTest } from "./config";
-
-const opts =
-{
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-};
 
 async function removeAllCollections ()
 {
@@ -26,7 +19,8 @@ async function dropAllCollections ()
         try
         {
             await collection.drop();
-        } catch ( error )
+        }
+        catch ( error )
         {
             // Sometimes this error happens, but you can safely ignore it
             if ( error.message === 'ns not found' ) return;
@@ -38,12 +32,19 @@ async function dropAllCollections ()
     }
 }
 
-const setUpDB = () =>
+const setUpDB = ( dbName ) =>
 {
     // Connect to Mongoose
     beforeAll( async () =>
     {
-        await connect( dbUrlTest, opts );
+        const opts =
+        {
+            useUnifiedTopology: true,
+            useNewUrlParser: true
+        };
+
+        const url = `mongodb://localhost:27017/${ dbName }`;
+        await connect( url, opts );
     } );
 
     // Cleans up database between each test

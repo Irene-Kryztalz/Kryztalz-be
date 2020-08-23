@@ -1,10 +1,11 @@
+// @ts-nocheck
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import { compareSync } from "bcrypt";
 import User from "../../models/user";
 import setUpDB from "../../setUpTests";
 
-setUpDB();
+setUpDB( "user-model" );
 
 //describe user model
 /**
@@ -36,4 +37,6 @@ describe( "The User model", () =>
 
     } );
 } );
+
+
 

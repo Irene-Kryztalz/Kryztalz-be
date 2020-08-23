@@ -3,7 +3,7 @@
  * 
  * If no status code on error object, set it to 500.
  * @param {Object} err Error Object.
- * @param {function} next 
+ * @param {function} next Call next middleware
  */
 const catchErr = ( err, next ) =>
 {
@@ -13,6 +13,27 @@ const catchErr = ( err, next ) =>
     }
 
     return next( err );
+};
+
+
+/**
+ * Catch error for bad requests from client (status code 4XX)
+ * @param {Object} errConfig Error message configuratons.
+ * @param {string} errConfig.msg Error message.
+ * @param {array} [errConfig.data = []] Data about the error.
+ * @param {number} [errConfig.statusCode = 422] Error status 
+ * code, default is 422.
+ *
+ * @param {function} next Call next middleware
+ */
+
+const handleValidationErr = ( { msg, data = [], statusCode = 422 }, next ) =>
+{
+    const error = new Error( msg );
+    error.statusCode = statusCode;
+    error.data = data;
+
+    catchErr( error, next );
 };
 
 /**
@@ -56,5 +77,6 @@ export
 {
     generateRandomToken,
     catchErr,
-    throwErr
+    throwErr,
+    handleValidationErr
 };
