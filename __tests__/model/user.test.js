@@ -43,8 +43,5 @@ describe( "The User model", () =>
             expect( error ).toBeTruthy();
         }
 
-
-
-
     } );
 } );
