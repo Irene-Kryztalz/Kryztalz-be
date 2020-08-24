@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body } from "express-validator";
+import { body, check } from "express-validator";
 
 import User from "../models/user";
 
@@ -12,8 +12,8 @@ router.post( "/signup",
     [
         body( "email", "Invalid Email" )
             .trim()
-            .isEmail()
             .normalizeEmail()
+            .isEmail()
             .custom( ( value ) => 
             {
                 return User.findOne( { email: value } )
@@ -30,9 +30,9 @@ router.post( "/signup",
             .isLength( { min: 1 } ),
         body( "password",
             "Password length must be at least 8 characters long. Only letters and numbers allowed" )
+            .trim()
             .isLength( { min: 8 } )
-            .isAlphanumeric()
-            .trim(),
+            .isAlphanumeric(),
         body( "confirmPassword" )
             .custom( ( value, { req } ) =>
             {
@@ -45,8 +45,26 @@ router.post( "/signup",
             .trim()
     ], postSignUp );
 
-router.post( "/signin", postSignIn );
+router.post( "/signin",
+    [
+        body( "email", "Invalid Email" )
+            .trim()
+            .normalizeEmail()
+            .isEmail(),
+        body( "password",
+            "Password length must be at least 8 characters long. Only letters and numbers allowed" )
+            .trim()
+            .notEmpty()
+    ], postSignIn );
 
-router.get( "/confirm-email", confirmEmail );
+router.get( "/confirm-email",
+    [
+        check( "id", "User id is invalid" )
+            .trim()
+            .notEmpty(),
+        check( "emailToken", "User token is invalid" )
+            .trim()
+            .notEmpty()
+    ], confirmEmail );
 
 export default router;

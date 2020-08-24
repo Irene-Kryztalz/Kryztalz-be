@@ -55,6 +55,11 @@ it( 'Should save user to database', async done =>
     done();
 } );
 
-
-
-
+it( "should verify that the user signed in with correct details", async done =>
+{
+    //seed db
+    //use luffy to sign in
+    //check luffy email = email in db
+    //check luffy pword = pword in db
+    done();
+} );
