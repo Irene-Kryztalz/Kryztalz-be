@@ -37,6 +37,3 @@ describe( "The User model", () =>
 
     } );
 } );
-
-
-

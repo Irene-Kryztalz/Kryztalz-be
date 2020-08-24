@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, check } from "express-validator";
+import { body, query } from "express-validator";
 
 import User from "../models/user";
 
@@ -14,6 +14,8 @@ router.post( "/signup",
             .trim()
             .normalizeEmail()
             .isEmail()
+            .not()
+            .isIn( [ "test@test.com" ] )
             .custom( ( value ) => 
             {
                 return User.findOne( { email: value } )
@@ -59,10 +61,10 @@ router.post( "/signin",
 
 router.get( "/confirm-email",
     [
-        check( "id", "User id is invalid" )
+        query( "id", "User id is invalid" )
             .trim()
             .notEmpty(),
-        check( "emailToken", "User token is invalid" )
+        query( "emailToken", "User token is invalid" )
             .trim()
             .notEmpty()
     ], confirmEmail );
