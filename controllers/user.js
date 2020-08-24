@@ -1,35 +1,32 @@
 import User from "../models/user";
 import sgMail from "@sendgrid/mail";
-import { validationResult } from "express-validator";
 
 import { sgKey, sender } from "../config";
-import { throwErr, catchErr, handleValidationErr } from "../utils";
+import { throwErr, catchErr, checkValidationErr } from "../utils";
 
 sgMail.setApiKey( sgKey );
 
-const postSignIn = ( req, res, next ) =>
+const postSignIn = async ( req, res, next ) =>
 {
+    const { name, email } = req.body;
 
+    checkValidationErr( req, next );
+
+    try 
+    {
+        const user = await User.find( { email } );
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
 };
 
 const postSignUp = async ( req, res, next ) =>
 {
     const { name, email, password, isAdmin } = req.body;
 
-
-    const errors = validationResult( req );
-
-    if ( !errors.isEmpty() )
-    {
-
-        const errObj =
-        {
-            msg: "One or more fields are invalid",
-            data: errors.array()
-        };
-
-        return handleValidationErr( errObj, next );
-    }
+    checkValidationErr( req, next );
 
     const user = await new User(
         {
@@ -52,7 +49,7 @@ const postSignUp = async ( req, res, next ) =>
 
     res.status( 201 ).json( response );
 
-    const msg = {
+    const message = {
         to: email,
         from: sender,
         subject: "Krystalz",
@@ -60,7 +57,7 @@ const postSignUp = async ( req, res, next ) =>
     };
 
     //send mail
-    sgMail.send( msg )
+    sgMail.send( message )
         .then( () => { } )
         .catch( error =>
         {
@@ -93,13 +90,13 @@ const confirmEmail = async ( req, res, next ) =>
                 user.emailTokenExpires = undefined;
                 await user.save();
 
-                res.status( 200 ).json( { msg: "User verified" } );
+                res.status( 200 ).json( { message: "User verified" } );
             }
             else
             {
                 const error =
                 {
-                    msg: "Invalid Action. Unable to verify user",
+                    message: "Invalid Action. Unable to verify user",
                     statusCode: 403
                 };
                 throwErr( error );
@@ -110,12 +107,11 @@ const confirmEmail = async ( req, res, next ) =>
         {
             const error =
             {
-                msg: "Expired Token",
+                message: "Expired Token",
                 statusCode: 403
             };
             throwErr( error );
         }
-
 
     }
     catch ( error ) 

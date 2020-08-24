@@ -5,7 +5,8 @@ import app from "./app";
 const options =
 {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    autoIndex: true
 };
 
 connect( dbUrl, options )

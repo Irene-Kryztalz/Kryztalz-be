@@ -1,3 +1,5 @@
+import { validationResult } from "express-validator";
+
 /**
  * Throw error for server failure (status code 5XX).
  * 
@@ -19,7 +21,7 @@ const catchErr = ( err, next ) =>
 /**
  * Catch error for bad requests from client (status code 4XX)
  * @param {Object} errConfig Error message configuratons.
- * @param {string} errConfig.msg Error message.
+ * @param {string} errConfig.message Error message.
  * @param {array} [errConfig.data = []] Data about the error.
  * @param {number} [errConfig.statusCode = 422] Error status 
  * code, default is 422.
@@ -27,25 +29,43 @@ const catchErr = ( err, next ) =>
  * @param {function} next Call next middleware
  */
 
-const handleValidationErr = ( { msg, data = [], statusCode = 422 }, next ) =>
+const handleValidationErr = ( { message, data = [], statusCode = 422 }, next ) =>
 {
-    const error = new Error( msg );
+    const error = new Error( message );
     error.statusCode = statusCode;
     error.data = data;
 
     catchErr( error, next );
 };
 
+const checkValidationErr = ( req, next ) =>
+{
+    const errors = validationResult( req );
+
+    if ( !errors.isEmpty() )
+    {
+
+        const errObj =
+        {
+            message: "One or more fields are invalid",
+            data: errors.array()
+        };
+
+        return handleValidationErr( errObj, next );
+    }
+};
+
+
 /**
  * Throw error for bad requests from client (status code 4XX)
  * @param {Object} errConfig Error message configuratons.
- * @param {string} errConfig.msg Error message.
+ * @param {string} errConfig.message Error message.
  * @param {array} [errConfig.data = []] Data about the error.
  * @param {number} [errConfig.statusCode = 422] Error status code, default is 422.
  */
-const throwErr = ( { msg, data = [], statusCode = 422 } ) =>
+const throwErr = ( { message, data = [], statusCode = 422 } ) =>
 {
-    const error = new Error( msg );
+    const error = new Error( message );
     error.statusCode = statusCode;
     error.data = data;
 
@@ -73,10 +93,12 @@ const generateRandomToken = ( len ) =>
     return token;
 };
 
+
 export
 {
     generateRandomToken,
     catchErr,
     throwErr,
+    checkValidationErr,
     handleValidationErr
 };

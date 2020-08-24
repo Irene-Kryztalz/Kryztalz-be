@@ -34,6 +34,17 @@ describe( "The User model", () =>
         expect( createdUser.emailTokenExpires ).toBeTruthy();
         expect( createdUser.isValid ).not.toBeTruthy();
 
+        try 
+        {
+            await new User( user ).save();
+        }
+        catch ( error ) 
+        {
+            expect( error ).toBeTruthy();
+        }
+
+
+
 
     } );
 } );
