@@ -1,20 +1,52 @@
-import User from "../models/user";
+import { compare } from "bcrypt";
+import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 
-import { sgKey, sender } from "../config";
+import User from "../models/user";
+import { sgKey, sender, jwtSecret } from "../config";
 import { throwErr, catchErr, checkValidationErr } from "../utils";
 
 sgMail.setApiKey( sgKey );
 
 const postSignIn = async ( req, res, next ) =>
 {
-    const { name, email } = req.body;
+    const { password, email } = req.body;
 
     checkValidationErr( req, next );
 
     try 
     {
         const user = await User.find( { email } );
+        if ( !user )
+        {
+            const error =
+            {
+                message: "Expired Token",
+                statusCode: 403
+            };
+            throwErr( error );
+        }
+
+        if ( !await compare( password, user.password ) )
+        {
+            const error =
+            {
+                message: "Email/Password mismatch",
+                statusCode: 401
+            };
+            throwErr( error );
+        }
+
+        const token = jwt.sign(
+            {
+                email,
+            }, jwtSecret,
+            { expiresIn: "1h" }
+        );
+
+        res.status( 200 ).json( { user: { token, email, expires: 1 } } );
+
+
     }
     catch ( error ) 
     {

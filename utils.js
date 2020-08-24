@@ -38,13 +38,19 @@ const handleValidationErr = ( { message, data = [], statusCode = 422 }, next ) =
     catchErr( error, next );
 };
 
+/**
+ * Check for existence of errors in the input validation middleware
+ * @param {Object} req The request
+ * @param {Function} next Call next middleware
+ * 
+ *  
+ */
 const checkValidationErr = ( req, next ) =>
 {
     const errors = validationResult( req );
 
     if ( !errors.isEmpty() )
     {
-
         const errObj =
         {
             message: "One or more fields are invalid",

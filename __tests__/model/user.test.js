@@ -11,7 +11,7 @@ setUpDB( "user-model" );
 /**
  * it should hash user pwd
  * it should generate email token
- *
+ * it should not allow duplicate email
  */
 
 describe( "The User model", () =>
