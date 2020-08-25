@@ -2,6 +2,7 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 import { compareSync } from "bcrypt";
+import permissions from "../../permissions";
 import User from "../../models/user";
 import setUpDB from "../../setUpTests";
 
@@ -22,7 +23,13 @@ describe( "The User model", () =>
         {
             name: "testing",
             password: "password",
-            email: "test@test.com"
+            email: "test@test.com",
+            permissions:
+            {
+                [ permissions.READ ]: true,
+                [ permissions.WRITE ]: false,
+                [ permissions.DELETE ]: false
+            }
         };
 
         const createdUser = await new User( user ).save();
@@ -33,6 +40,8 @@ describe( "The User model", () =>
         expect( createdUser.emailToken ).toBeTruthy();
         expect( createdUser.emailTokenExpires ).toBeTruthy();
         expect( createdUser.isValid ).not.toBeTruthy();
+
+        expect( createdUser.permissions[ permissions.READ ] ).toEqual( true );
 
         try 
         {

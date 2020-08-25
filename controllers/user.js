@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 
 import User from "../models/user";
+import permissions from "../permissions";
 import { sgKey, sender, jwtSecret } from "../config";
 import { throwErr, catchErr, checkValidationErr } from "../utils";
 
@@ -56,7 +57,7 @@ const postSignIn = async ( req, res, next ) =>
 
 const postSignUp = async ( req, res, next ) =>
 {
-    const { name, email, password, isAdmin } = req.body;
+    const { name, email, password } = req.body;
 
     checkValidationErr( req, next );
 
@@ -66,7 +67,12 @@ const postSignUp = async ( req, res, next ) =>
             wishlist: [],
             cart: [],
             isVerified: false,
-            isAdmin
+            permissions:
+            {
+                [ permissions.READ ]: true,
+                [ permissions.WRITE ]: false,
+                [ permissions.DELETE ]: false
+            }
         } ).save();
 
     const response =
@@ -93,10 +99,9 @@ const postSignUp = async ( req, res, next ) =>
         .then( () => { } )
         .catch( error =>
         {
-            console.error( error );
             if ( error.response )
             {
-                console.error( error.response.body );
+                console.error( "mail sending failed" );
             }
         } );
 

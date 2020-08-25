@@ -53,7 +53,10 @@ const userSchema = new Schema(
         isVerified: Boolean,
         emailToken: String,
         emailTokenExpires: Date,
-        isAdmin: Boolean
+        permissions:
+        {
+            type: Object
+        }
 
     }
 );
@@ -84,6 +87,25 @@ userSchema.pre( 'save', async function ( next )
 
     next();
 } );
+
+/**
+ * Add a permission to a user
+ * @param {number} perm The permission id
+ */
+userSchema.methods.addPerm = function ( perm )
+{
+
+};
+
+/**
+ * Remove a permission from a user
+ * @param {number} perm The permission id
+ */
+userSchema.methods.addPerm = function ( perm )
+{
+
+};
+
 
 
 export default model( "User", userSchema );
