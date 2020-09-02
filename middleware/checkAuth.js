@@ -26,6 +26,7 @@ const checkAuth = ( req, res, next ) =>
     }
     catch ( error ) 
     {
+        error.statusCode = 403;
         return catchErr( error, next );
     }
 

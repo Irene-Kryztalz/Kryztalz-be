@@ -1,8 +1,41 @@
 import path from "path";
+import multer from "multer";
 import express from "express";
+import { nanoid } from 'nanoid';
 import { json } from "body-parser";
 import userRoutes from "./routes/user";
 import adminRoutes from "./routes/admin";
+
+const fileStorage = multer.diskStorage(
+    {
+        destination: ( req, file, cb ) =>
+        {
+            cb( null, `./images` );
+        },
+        filename: ( req, file, cb ) =>
+        {
+            const fileId = nanoid();
+            cb( null, `${ fileId }-${ file.originalname }` );
+        },
+    } );
+
+
+
+const fileFilter = ( req, file, cb ) =>
+{
+    if ( file.mimetype === "image/jpeg" ||
+        file.mimetype === "image/jpg" ||
+        file.mimetype === "image/png" ||
+        file.mimetype === "image/webp" )
+    {
+        cb( null, true );
+    }
+    else
+    {
+        cb( null, false );
+    }
+
+};
 
 const app = express();
 
@@ -15,6 +48,7 @@ app.use( ( req, res, next ) =>
 } );
 
 app.use( json() );
+app.use( multer( { fileFilter, storage: fileStorage } ).array( 'photos', 4 ) );
 
 app.use( "/images", express.static( path.join( __dirname, "images" ) ) );
 app.get( "/favicon.ico", ( req, res ) => 
@@ -35,7 +69,6 @@ app.get( '/test', async ( req, res ) =>
 app.use( ( req, res, next ) =>
 {
     const err = new Error( "Not Found" );
-
 
     err.statusCode = 404;
 

@@ -18,7 +18,7 @@ const postSignIn = async ( req, res, next ) =>
     try 
     {
 
-        const user = await User.findOne( { email } );
+        const user = await User.find( { email } );
         if ( !user )
         {
             const error =
@@ -44,7 +44,7 @@ const postSignIn = async ( req, res, next ) =>
                 email,
                 userId: user._id.toString()
             }, jwtSecret,
-            { expiresIn: "5m" }
+            { expiresIn: "1m" }
         );
 
 
