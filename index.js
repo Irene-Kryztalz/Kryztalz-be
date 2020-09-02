@@ -6,7 +6,8 @@ const options =
 {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    autoIndex: true
+    autoIndex: true,
+    useCreateIndex: true
 };
 
 connect( dbUrl, options )

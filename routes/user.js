@@ -69,4 +69,5 @@ router.get( "/confirm-email",
             .notEmpty()
     ], confirmEmail );
 
+
 export default router;

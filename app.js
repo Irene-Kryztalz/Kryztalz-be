@@ -1,8 +1,8 @@
 import path from "path";
 import express from "express";
 import { json } from "body-parser";
-
 import userRoutes from "./routes/user";
+import adminRoutes from "./routes/admin";
 
 const app = express();
 
@@ -25,6 +25,7 @@ app.get( "/favicon.ico", ( req, res ) =>
 
 
 app.use( "/user", userRoutes );
+app.use( "/admin", adminRoutes );
 
 app.get( '/test', async ( req, res ) =>
 {
@@ -35,6 +36,7 @@ app.use( ( req, res, next ) =>
 {
     const err = new Error( "Not Found" );
 
+
     err.statusCode = 404;
 
     next( err );
@@ -43,9 +45,15 @@ app.use( ( req, res, next ) =>
 
 app.use( ( error, req, res, next ) =>
 {
+
     const message = error.message;
     const status = error.statusCode || 500;
-    const data = error.data.length > 0 ? error.data : undefined;
+    let data = undefined;
+
+    if ( error.data )
+    {
+        data = error.data;
+    }
 
     res.status( status ).json( { message, data } );
 

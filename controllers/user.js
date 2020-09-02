@@ -17,7 +17,8 @@ const postSignIn = async ( req, res, next ) =>
 
     try 
     {
-        const user = await User.find( { email } );
+
+        const user = await User.findOne( { email } );
         if ( !user )
         {
             const error =
@@ -41,11 +42,13 @@ const postSignIn = async ( req, res, next ) =>
         const token = jwt.sign(
             {
                 email,
+                userId: user._id.toString()
             }, jwtSecret,
-            { expiresIn: "1h" }
+            { expiresIn: "5m" }
         );
 
-        res.status( 200 ).json( { user: { token, email, expires: 1 } } );
+
+        res.status( 200 ).json( { user: { token, email } } );
 
 
     }
@@ -157,6 +160,7 @@ const confirmEmail = async ( req, res, next ) =>
     }
 
 };
+
 
 export
 {
