@@ -15,6 +15,21 @@ const postProduct = ( req, res, next ) =>
     res.json( { message: "kkk" } );
 };
 
+const editProduct = ( req, res, next ) =>
+{
+
+    res.json( { message: "edit" } );
+};
+
+const deleteProduct = ( req, res, next ) =>
+{
+
+    res.json( { message: "delete" } );
+};
+
+
+
+
 export
 {
     getProducts,

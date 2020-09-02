@@ -18,7 +18,7 @@ const postSignIn = async ( req, res, next ) =>
     try 
     {
 
-        const user = await User.find( { email } );
+        const user = await User.findOne( { email } );
         if ( !user )
         {
             const error =
