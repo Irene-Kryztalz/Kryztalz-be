@@ -41,6 +41,7 @@ const checkAuth = ( req, res, next ) =>
         throwErr( error );
     }
 
+    // @ts-ignore
     req.userId = decodedToken.userId;
     next();
 

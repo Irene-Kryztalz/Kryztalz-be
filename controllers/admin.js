@@ -1,27 +1,27 @@
-//add a product
-//edit a product
-//delete a product
-//view all products
-//view a specfic product
+//add a Gem
+//edit a Gem
+//delete a Gem
+//view all Gems
+//view a specfic Gem
 
-const getProducts = ( req, res, next ) =>
+const getGems = ( req, res, next ) =>
 {
     res.json( { message: "JJJ" } );
 };
 
-const postProduct = ( req, res, next ) =>
+const postGem = ( req, res, next ) =>
 {
 
     res.json( { message: "kkk" } );
 };
 
-const editProduct = ( req, res, next ) =>
+const editGem = ( req, res, next ) =>
 {
 
     res.json( { message: "edit" } );
 };
 
-const deleteProduct = ( req, res, next ) =>
+const deleteGem = ( req, res, next ) =>
 {
 
     res.json( { message: "delete" } );
@@ -32,6 +32,8 @@ const deleteProduct = ( req, res, next ) =>
 
 export
 {
-    getProducts,
-    postProduct
+    getGems,
+    postGem,
+    editGem,
+    deleteGem
 };

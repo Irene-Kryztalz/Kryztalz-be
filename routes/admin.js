@@ -1,15 +1,19 @@
 import { Router } from "express";
 import
-    {
-        getProducts,
-        postProduct
-    } from "../controllers/admin";
+{
+    getGems,
+    postGem,
+    editGem,
+    deleteGem
+} from "../controllers/admin";
 import checkAuth from "../middleware/checkAuth";
 
 const router = Router();
 
-router.get( "/products", checkAuth, getProducts );
-router.post( "/products", checkAuth, postProduct );
+router.get( "/gems", checkAuth, getGems );
+router.post( "/gems", checkAuth, postGem );
+router.post( "/gems", checkAuth, editGem );
+router.delete( "/gems:id", checkAuth, deleteGem );
 
 
 export default router;

@@ -29,6 +29,7 @@ const postSignIn = async ( req, res, next ) =>
             throwErr( error );
         }
 
+        // @ts-ignore
         if ( !await compare( password, user.password ) )
         {
             const error =
