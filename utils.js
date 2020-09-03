@@ -69,7 +69,7 @@ const checkValidationErr = ( req, next ) =>
  * @param {array} [errConfig.data = []] Data about the error.
  * @param {number} [errConfig.statusCode = 422] Error status code, default is 422.
  */
-const throwErr = ( { message, data = [], statusCode = 422 } ) =>
+const throwErr = ( { message, data = [], statusCode = 401 } ) =>
 {
     const error = new Error( message );
     error.statusCode = statusCode;
@@ -99,6 +99,24 @@ const generateRandomToken = ( len ) =>
     return token;
 };
 
+const parseBool = value =>
+{
+    switch ( value )
+    {
+        case false:
+        case "false":
+        case "undefined":
+        case null:
+        case undefined:
+        case NaN:
+        case 0:
+            return false;
+
+        default:
+            return true;
+    }
+};
+
 
 export
 {
@@ -106,5 +124,6 @@ export
     catchErr,
     throwErr,
     checkValidationErr,
-    handleValidationErr
+    handleValidationErr,
+    parseBool
 };

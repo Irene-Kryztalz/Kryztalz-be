@@ -1,18 +1,53 @@
 //add a Gem
 //edit a Gem
 //delete a Gem
-//view all Gems
 //view a specfic Gem
+import Gem from "../models/gem";
+import { throwErr, catchErr, checkValidationErr, parseBool } from "../utils";
 
-const getGems = ( req, res, next ) =>
+const postGem = async ( req, res, next ) =>
 {
-    res.json( { message: "JJJ" } );
-};
+    const images = req.files;
 
-const postGem = ( req, res, next ) =>
-{
+    if ( images.length < 1 || images.length > 4 )
+    {
+        throwErr( { message: "Invalid Images.\nNumber of images must be at least 1 and less than 5", statusCode: 400 } );
+    }
+    checkValidationErr( req, next );
 
-    res.json( { message: "kkk" } );
+    try 
+    {
+        let { type, name, isRough, cutType, weight, price, description } = req.body;
+
+        isRough = isRough === "";
+
+        if ( parseBool( isRough ) )
+        {
+            cutType = undefined;
+        }
+        else
+        {
+            isRough = undefined;
+        }
+
+
+
+        const imageUrls = images.map( img => img.path.replace( "\\", "/" ) );
+
+        const gem = await new Gem(
+            {
+                type, name, isRough, cutType, weight, price, description, imageUrls
+            }
+        ).save();
+
+        res.status( 201 ).json( gem );
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+
+
 };
 
 const editGem = ( req, res, next ) =>
@@ -32,7 +67,7 @@ const deleteGem = ( req, res, next ) =>
 
 export
 {
-    getGems,
+
     postGem,
     editGem,
     deleteGem

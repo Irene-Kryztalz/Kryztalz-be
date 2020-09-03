@@ -87,7 +87,7 @@ describe( 'Test sign in process', () =>
         const res = await request.post( '/user/signin' )
             .send( { email: userB.email, password: userB.password } );
 
-        expect( res.body.error.message ).toEqual( "Invalid user" );
+        expect( res.body.message ).toEqual( "Invalid user" );
         done();
 
     } );

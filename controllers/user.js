@@ -34,8 +34,7 @@ const postSignIn = async ( req, res, next ) =>
         {
             const error =
             {
-                message: "Email/Password mismatch",
-                statusCode: 401
+                message: "Email/Password mismatch"
             };
             throwErr( error );
         }
@@ -45,7 +44,7 @@ const postSignIn = async ( req, res, next ) =>
                 email,
                 userId: user._id.toString()
             }, jwtSecret,
-            { expiresIn: "1m" }
+            { expiresIn: "10m" }
         );
 
 

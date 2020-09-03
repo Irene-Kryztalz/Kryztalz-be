@@ -11,11 +11,8 @@ const gemSchema = new Schema( {
         type: String,
         required: true,
     },
-    category:
-    {
-        type: String,
-        required: true,
-    },
+    isRough: Boolean,
+    cutType: String,
     weight:
     {
         type: Types.Decimal128,
