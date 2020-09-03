@@ -19,11 +19,11 @@ const postSignIn = async ( req, res, next ) =>
     {
 
         const user = await User.findOne( { email } );
-        if ( !user )
+        if ( !user || !user.isVerified )
         {
             const error =
             {
-                message: "Expired Token",
+                message: "Invalid user",
                 statusCode: 403
             };
             throwErr( error );

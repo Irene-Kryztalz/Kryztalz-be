@@ -5,6 +5,7 @@ import supertest from "supertest";
 
 import setUpDB from "../../setUpTests";
 import app from "../../app";
+import User from "../../models/user";
 
 const request = supertest( app );
 setUpDB( "user-endpoint" );
@@ -30,7 +31,7 @@ const users = [
     }
 ];
 
-it( 'Tests that server is actiive', async done =>
+it( 'Tests that server is active', async done =>
 {
     // Sends GET Request to /test endpoint
     const response = await request.get( '/test' );
@@ -55,11 +56,41 @@ it( 'Should save user to database', async done =>
     done();
 } );
 
-it( "should verify that the user signed in with correct details", async done =>
+
+
+describe( 'Test sign in process', () =>
 {
-    //seed db
-    //use luffy to sign in
-    //check luffy email = email in db
-    //check luffy pword = pword in db
-    done();
+
+
+    it( "should verify that the user signed in with correct details", async done =>
+    {
+
+        const userA = await User.create( users[ 0 ] );
+
+        await request.get( `/user/confirm-email?id=${ userA._id }&emailToken=${ userA.emailToken }` );
+
+        const res = await request.post( '/user/signin' )
+            .send( { email: userA.email, password: users[ 0 ].password } );
+
+
+        expect( res.body.user.email ).toEqual( userA.email );
+
+        done();
+    } );
+
+
+    it( "should not sign user in", async ( done ) => 
+    {
+
+        const userB = await User.create( users[ 1 ] );
+
+        const res = await request.post( '/user/signin' )
+            .send( { email: userB.email, password: userB.password } );
+
+        expect( res.body.error.message ).toEqual( "Invalid user" );
+        done();
+
+    } );
+
+
 } );
