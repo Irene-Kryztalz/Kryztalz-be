@@ -23,11 +23,11 @@ const postGem = async ( req, res, next ) =>
 
         if ( parseBool( isRough ) )
         {
-            cutType = undefined;
+            cutType = null;
         }
         else
         {
-            isRough = undefined;
+            isRough = false;
         }
 
 
@@ -36,7 +36,12 @@ const postGem = async ( req, res, next ) =>
 
         const gem = await new Gem(
             {
-                type, name, isRough, cutType, weight, price, description, imageUrls
+                type: type.toLowerCase(),
+                name: name.toLowerCase(),
+                cutType: cutType.toLowerCase(),
+                isRough,
+                weight,
+                price, description, imageUrls
             }
         ).save();
 

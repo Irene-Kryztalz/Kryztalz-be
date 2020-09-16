@@ -13,12 +13,18 @@ const postSignIn = async ( req, res, next ) =>
 {
     const { password, email } = req.body;
 
-    checkValidationErr( req, next );
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+
+        return catchErr( errs, next );
+    }
 
     try 
     {
 
-        const user = await User.findOne( { email } );
+        const user = await User.findOne( { email: email.toLowerCase() } );
         if ( !user || !user.isVerified )
         {
             const error =
@@ -62,11 +68,18 @@ const postSignUp = async ( req, res, next ) =>
 {
     const { name, email, password } = req.body;
 
-    checkValidationErr( req, next );
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
 
     const user = await new User(
         {
-            name, email, password,
+            name,
+            email: email.toLowerCase(),
+            password,
             wishlist: [],
             cart: [],
             isVerified: false,
@@ -89,6 +102,9 @@ const postSignUp = async ( req, res, next ) =>
     };
 
     res.status( 201 ).json( response );
+
+    //delete this later
+    console.log( `http://localhost:3031/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }` );
 
     const message = {
         to: email,

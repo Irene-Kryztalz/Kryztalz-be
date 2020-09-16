@@ -49,7 +49,7 @@ it( 'Should save user to database', async done =>
         .send( users[ 2 ] );
 
     //Ensures response contains name and email
-    expect( res.body.user.name ).toEqual( "Levi" );
+    expect( res.body.user.name ).toEqual( users[ 2 ].name );
     expect( res.body.user.email ).toEqual( "humanity_strongest@gmail.com" );
 
 

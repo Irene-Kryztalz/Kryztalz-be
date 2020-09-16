@@ -15,7 +15,7 @@ const router = Router();
 
 
 router.post( "/gems", checkAuth, fileUpload, postGem );
-router.post( "/gems", checkAuth, fileUpload, editGem );
+router.put( "/gems:id", checkAuth, fileUpload, editGem );
 router.delete( "/gems:id", checkAuth, deleteGem );
 
 

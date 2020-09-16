@@ -13,52 +13,7 @@ const catchErr = ( err, next ) =>
     {
         err.statusCode = 500;
     }
-
     return next( err );
-};
-
-
-/**
- * Catch error for bad requests from client (status code 4XX)
- * @param {Object} errConfig Error message configuratons.
- * @param {string} errConfig.message Error message.
- * @param {array} [errConfig.data = []] Data about the error.
- * @param {number} [errConfig.statusCode = 422] Error status 
- * code, default is 422.
- *
- * @param {function} next Call next middleware
- */
-
-const handleValidationErr = ( { message, data = [], statusCode = 422 }, next ) =>
-{
-    const error = new Error( message );
-    error.statusCode = statusCode;
-    error.data = data;
-
-    catchErr( error, next );
-};
-
-/**
- * Check for existence of errors in the input validation middleware
- * @param {Object} req The request
- * @param {Function} next Call next middleware
- * 
- *  
- */
-const checkValidationErr = ( req, next ) =>
-{
-    const errors = validationResult( req );
-
-    if ( !errors.isEmpty() )
-    {
-        const errObj =
-        {
-            message: "One or more fields are invalid",
-            data: errors.array()
-        };
-
-        return handleValidationErr( errObj, next );
-    }
 };
 
 
@@ -77,6 +32,47 @@ const throwErr = ( { message, data = [], statusCode = 401 } ) =>
 
     throw error;
 };
+
+
+
+/**
+ * Catch error for bad requests from client (status code 4XX)
+ * @param {Object} errConfig Error message configuratons.
+ * @param {string} errConfig.message Error message.
+ * @param {array} [errConfig.data = []] Data about the error.
+ * @param {number} [errConfig.statusCode = 422] Error status 
+ * code, default is 422.
+ *
+ * @param {function} next Call next middleware
+ */
+
+
+/**
+ * Check for existence of errors in the input validation middleware
+ * @param {Object} req The request
+ * @param {Function} next Call next middleware
+ * 
+ *  
+ */
+const checkValidationErr = ( req ) =>
+{
+    const errors = validationResult( req );
+
+    if ( !errors.isEmpty() )
+    {
+
+        const error =
+        {
+            message: "One or more fields are invalid",
+            data: errors.array(),
+            statusCode: 401
+        };
+        console.log( 77 );
+        return error;
+    }
+    return null;
+};
+
 
 /**
  * Generate an string of random characters.
@@ -124,6 +120,5 @@ export
     catchErr,
     throwErr,
     checkValidationErr,
-    handleValidationErr,
     parseBool
 };
