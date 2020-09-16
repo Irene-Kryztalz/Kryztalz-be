@@ -18,7 +18,6 @@ connect( dbUrl, options )
         app.listen( port, () =>
         {
             console.log( `Server is listening at port ${ port }` );
-
         } );
 
     } )

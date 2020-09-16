@@ -47,12 +47,7 @@ app.use( ( error, req, res, next ) =>
 
     const message = error.message;
     const status = error.statusCode || 500;
-    let data = undefined;
-
-    if ( error.data )
-    {
-        data = error.data;
-    }
+    let data = error.data;
 
     res.status( status ).json( { message, data } );
 

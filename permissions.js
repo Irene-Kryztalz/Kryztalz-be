@@ -1,12 +1,16 @@
-const READ = 1; // 001
-const WRITE = 2; // 010
-const DELETE = 4; // 100
+const READ = "read";
+const WRITE = "write";
+const DELETE = "delete";
+const ALL = "all";
+const NONE = "none";
 
 const config =
 {
     READ,
     WRITE,
-    DELETE
+    DELETE,
+    ALL,
+    NONE
 };
 
 export default config;

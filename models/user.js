@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { hash } from "bcrypt";
+import permissions from "../permissions";
 import { generateRandomToken } from "../utils";
 
 const userSchema = new Schema(
@@ -90,22 +91,39 @@ userSchema.pre( 'save', async function ( next )
 
 /**
  * Add a permission to a user
- * @param {number} perm The permission id
+ * @param {string} perm The permission 
  */
 userSchema.methods.addPerm = function ( perm )
 {
-
+    if ( permissions[ perm ] )
+    {
+        const user = this;
+        user.permissions[ perm ] = true;
+        return user.save();
+    }
+    else
+    {
+        throw Error( `Cannot add permission ${ perm } to the user` );
+    }
 };
 
 /**
  * Remove a permission from a user
- * @param {number} perm The permission id
+ * @param {string} perm The permission 
  */
-userSchema.methods.addPerm = function ( perm )
+userSchema.methods.removePerm = function ( perm )
 {
-
+    if ( permissions[ perm ] )
+    {
+        const user = this;
+        user.permissions[ perm ] = false;
+        return user.save();
+    }
+    else
+    {
+        throw Error( `Cannot remove permission ${ perm } from user` );
+    }
 };
-
 
 
 export default model( "User", userSchema );

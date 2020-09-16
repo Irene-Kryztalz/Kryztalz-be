@@ -28,7 +28,7 @@ const throwErr = ( { message, data = [], statusCode = 401 } ) =>
 {
     const error = new Error( message );
     error.statusCode = statusCode;
-    error.data = data;
+    error.data = data.length ? data : undefined;
 
     throw error;
 };
@@ -67,7 +67,6 @@ const checkValidationErr = ( req ) =>
             data: errors.array(),
             statusCode: 401
         };
-        console.log( 77 );
         return error;
     }
     return null;

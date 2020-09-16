@@ -1,3 +1,5 @@
+import { format } from "url";
+import { port } from "../config";
 import { compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
@@ -17,9 +19,9 @@ const postSignIn = async ( req, res, next ) =>
 
     if ( errs )
     {
-
         return catchErr( errs, next );
     }
+
 
     try 
     {
@@ -103,17 +105,24 @@ const postSignUp = async ( req, res, next ) =>
 
     res.status( 201 ).json( response );
 
-    //delete this later
-    console.log( `http://localhost:3031/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }` );
+    const url = `${ format(
+        {
+            protocol: req.protocol,
+            host: req.hostname,
+        } ) }:${ port }/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }`;
 
-    const message = {
+    //delete this later
+    console.log( `${ url }` );
+
+    //send mail
+    /*
+      const message = {
         to: email,
         from: sender,
         subject: "Krystalz",
-        html: `<a target="_blank" href="http://localhost:3031/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
+        html: `<a target="_blank" href="${ url }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
     };
-
-    //send mail
+    
     sgMail.send( message )
         .then( () => { } )
         .catch( error =>
@@ -123,6 +132,7 @@ const postSignUp = async ( req, res, next ) =>
                 console.error( "mail sending failed" );
             }
         } );
+        */
 
 };
 
