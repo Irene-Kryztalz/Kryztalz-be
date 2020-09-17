@@ -1,8 +1,8 @@
-const READ = "read";
-const WRITE = "write";
-const DELETE = "delete";
-const ALL = "all";
-const NONE = "none";
+const READ = "READ";
+const WRITE = "WRITE";
+const DELETE = "DELETE";
+const ALL = "ALL";
+const NONE = "NONE";
 
 const config =
 {

@@ -23,16 +23,21 @@ const postGem = async ( req, res, next ) =>
 
         if ( parseBool( isRough ) )
         {
-            cutType = null;
+            cutType = "";
         }
         else
         {
             isRough = false;
         }
 
-
-
-        const imageUrls = images.map( img => img.path.replace( "\\", "/" ) );
+        const imageUrls = images.map( img => 
+        {
+            if ( img.path.includes( "\\" ) )
+            {
+                return img.path.replace( "\\", "/" );
+            }
+            return img.path;
+        } );
 
         const gem = await new Gem(
             {

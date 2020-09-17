@@ -1,3 +1,5 @@
+import fs from 'fs';
+import { resolve } from "path";
 import { validationResult } from "express-validator";
 
 /**
@@ -50,7 +52,6 @@ const throwErr = ( { message, data = [], statusCode = 401 } ) =>
 /**
  * Check for existence of errors in the input validation middleware
  * @param {Object} req The request
- * @param {Function} next Call next middleware
  * 
  *  
  */
@@ -112,6 +113,33 @@ const parseBool = value =>
     }
 };
 
+const deleteFiles = ( imageArray ) =>
+{
+    return Promise.all( imageArray.map( file => 
+    {
+        const filePath = resolve( __dirname, file );
+
+        return new Promise( ( resolve, reject ) => 
+        {
+            try 
+            {
+                fs.unlink( filePath, err =>
+                {
+                    if ( err ) throw err;
+                    resolve( true );
+                } );
+            }
+            catch ( error )
+            {
+                reject( false );
+            }
+        } );
+
+
+    } )
+    );
+};
+
 
 export
 {
@@ -119,5 +147,6 @@ export
     catchErr,
     throwErr,
     checkValidationErr,
-    parseBool
+    parseBool,
+    deleteFiles
 };

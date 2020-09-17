@@ -1,15 +1,20 @@
 import { throwErr, catchErr } from "../utils";
+import permissions from "../permissions";
 import User from "../models/user";
 
-const checkPermissions = ( permission ) => ( req, res, next ) =>
+const checkPermissions = ( permission ) => async ( req, res, next ) =>
 {
     try 
     {
-        const userPerms = User.findById( req.userId );
-        if ( userPerms[ permission ] )
+
+        const userPerms = await User.findById( req.userId );
+
+        const condition = ( userPerms.permissions[ permission ] || userPerms.permissions[ permissions.ALL ] ) && !userPerms.permissions[ permissions.NONE ];
+
+
+
+        if ( permissions[ permission ] && condition )
         {
-            console.log( permission );
-            console.log( userPerms );
             next();
         }
         else
@@ -23,8 +28,10 @@ const checkPermissions = ( permission ) => ( req, res, next ) =>
             throwErr( error );
         }
 
-    } catch ( error ) 
+    }
+    catch ( error ) 
     {
+
         error.statusCode = 403;
         return catchErr( error, next );
     }

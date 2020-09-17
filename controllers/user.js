@@ -84,13 +84,16 @@ const postSignUp = async ( req, res, next ) =>
             password,
             wishlist: [],
             cart: [],
-            isVerified: false,
             permissions:
             {
                 [ permissions.READ ]: true,
                 [ permissions.WRITE ]: false,
-                [ permissions.DELETE ]: false
+                [ permissions.DELETE ]: false,
+                [ permissions.NONE ]: false,
+                [ permissions.ALL ]: false
             }
+
+
         } ).save();
 
     const response =
@@ -154,6 +157,7 @@ const confirmEmail = async ( req, res, next ) =>
                 user.isVerified = true;
                 user.emailToken = undefined;
                 user.emailTokenExpires = undefined;
+
                 await user.save();
 
                 res.status( 200 ).json( { message: "User verified" } );

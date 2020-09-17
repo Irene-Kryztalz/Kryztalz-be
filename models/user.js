@@ -75,7 +75,6 @@ userSchema.pre( 'save', async function ( next )
     if ( user.password && user.isModified( "password" ) )
     {
         const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
-
         // @ts-ignore
         user.emailToken = generateRandomToken( 12 );
         user.emailTokenExpires = new Date( oneHr );
@@ -85,7 +84,6 @@ userSchema.pre( 'save', async function ( next )
 
     }
 
-
     next();
 } );
 
@@ -93,17 +91,18 @@ userSchema.pre( 'save', async function ( next )
  * Add a permission to a user
  * @param {string} perm The permission 
  */
-userSchema.methods.addPerm = function ( perm )
+userSchema.methods.addPerm = async function ( perm )
 {
-    if ( permissions[ perm ] )
+    if ( perm in permissions )
     {
-        const user = this;
+        let user = this;
         user.permissions[ perm ] = true;
         return user.save();
     }
     else
     {
-        throw Error( `Cannot add permission ${ perm } to the user` );
+        const msg = `Cannot add permission ${ perm } to the user`;
+        throw Error( msg );
     }
 };
 
