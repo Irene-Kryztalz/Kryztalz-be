@@ -7,7 +7,7 @@ const checkPermissions = ( permission ) => async ( req, res, next ) =>
 {
     try 
     {
-        const user = await User.findById( req.userId, "roleId permissions" );
+        const user = await User.findById( req.userId );
 
         if ( user.permissions[ permissions[ permission ] ] || user.roleId === roles.SUPER_ADMIN )
         {
