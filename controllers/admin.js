@@ -93,6 +93,26 @@ const addUserPermission = async ( req, res, next ) =>
 
 };
 
+const removeUserPermission = async ( req, res, next ) =>
+{
+    const { id, perms } = req.body;
+
+    try 
+    {
+        const userToEdit = await User.findById( id, "roleId permissions" );
+
+        userToEdit.removePerm( perms );
+
+        res.end();
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+        res.end();
+    }
+
+};
+
 const getPermissions = ( req, res ) =>
 {
     res.status( 200 ).json( permissions );
@@ -107,6 +127,7 @@ export
     postGem,
     editGem,
     deleteGem,
-    addUserPermission,
     getPermissions,
+    addUserPermission,
+    removeUserPermission,
 };

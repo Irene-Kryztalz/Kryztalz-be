@@ -4,8 +4,9 @@ import
     postGem,
     editGem,
     deleteGem,
-    addUserPermission,
     getPermissions,
+    addUserPermission,
+    removeUserPermission
 } from "../controllers/admin";
 import permissions from "../access/permissions";
 import checkAuth from "../middleware/checkAuth";
@@ -20,6 +21,7 @@ router.put( "/gems:id", checkAuth, checkPermissions( permissions.EDIT_GEM ), fil
 router.delete( "/gems:id", checkAuth, checkPermissions( permissions.DELETE_GEM ), deleteGem );
 
 router.put( "/add-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), addUserPermission );
+router.put( "/remove-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), removeUserPermission );
+router.get( "/get-permissions", checkAuth, checkPermissions( permissions.READ_USER ), getPermissions );
 
-router.get( "/get-permissions", checkAuth, getPermissions );
 export default router;

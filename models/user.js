@@ -113,7 +113,17 @@ userSchema.methods.addPerm = async function ( perms )
  */
 userSchema.methods.removePerm = function ( perms )
 {
+    const user = this;
 
+    perms.forEach( perm => 
+    {
+        if ( perm in inverse && !!( user.roleId & perm ) )
+        {
+            user.roleId = user.roleId ^ +perm;
+        }
+    } );
+
+    user.save();
 };
 
 export default model( "User", userSchema );

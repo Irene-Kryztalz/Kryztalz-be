@@ -1,6 +1,5 @@
 import { throwErr, catchErr } from "../utils";
 import roles from "../access/roles";
-import permissions from "../access/permissions";
 import User from "../models/user";
 
 const checkPermissions = ( permission ) => async ( req, res, next ) =>
