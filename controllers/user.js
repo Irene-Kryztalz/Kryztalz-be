@@ -28,8 +28,7 @@ const postSignIn = async ( req, res, next ) =>
         {
             const error =
             {
-                message: "Invalid user",
-                statusCode: 403
+                message: "Invalid user"
             };
             throwErr( error );
         }
@@ -106,23 +105,24 @@ const postSignUp = async ( req, res, next ) =>
 
     //send mail
     /*
-      const message = {
-        to: email,
-        from: sender,
-        subject: "Krystalz",
-        html: `<a target="_blank" href="${ url }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
-    };
+        const message = {
+            to: email,
+            from: sender,
+            subject: "Krystalz",
+            html: `<a target="_blank" href="${ url }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
+        };
     
-    sgMail.send( message )
-        .then( () => { } )
-        .catch( error =>
-        {
-            if ( error.response )
+        sgMail.send( message )
+            .then( () => { } )
+            .catch( error =>
             {
-                console.error( "mail sending failed" );
-            }
-        } );
-        */
+                if ( error.response )
+                {
+                    console.error( "Mail sending failed" );
+                }
+            } );
+    
+            */
 
 };
 
