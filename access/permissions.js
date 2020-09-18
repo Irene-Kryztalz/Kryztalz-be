@@ -1,5 +1,3 @@
-
-
 const permissions =
 {
     ADD_GEM: 1,       // 00000001
@@ -12,5 +10,14 @@ const permissions =
     DELETE_USER: 128, // 10000000
 
 };
+
+const inverse = {};
+
+Object.keys( permissions ).forEach( k =>
+{
+    inverse[ permissions[ k ] ] = k;
+} );
+
+export { inverse };
 
 export default permissions;

@@ -1,25 +1,9 @@
 // @ts-nocheck
 import { model, Schema } from "mongoose";
 import { hash } from "bcrypt";
-import permissions from "../access/permissions";
+import { inverse } from "../access/permissions";
 import roles from "../access/roles";
 import { generateRandomToken } from "../utils";
-
-function defaultPermissions ()
-{
-    return (
-        {
-            [ permissions.ADD_GEM ]: false,
-            [ permissions.READ_GEM ]: true,
-            [ permissions.EDIT_GEM ]: false,
-            [ permissions.DELETE_GEM ]: false,
-            [ permissions.ADD_USER ]: false,
-            [ permissions.READ_USER ]: false,
-            [ permissions.EDIT_USER ]: false,
-            [ permissions.DELETE_USER ]: false,
-        }
-    );
-}
 
 const userSchema = new Schema(
     {
@@ -77,14 +61,7 @@ const userSchema = new Schema(
         {
             type: Number,
             default: roles.NORMAL
-        },
-        permissions:
-        {
-            type: Schema.Types.Mixed,
-            default: defaultPermissions
         }
-
-
     }
 );
 
@@ -111,19 +88,30 @@ userSchema.pre( 'save', async function ( next )
 } );
 
 /**
- * Add a permission to a user
- * @param {string} perm The permission 
+ * Add a permissions to a user
+ * @param {Array} perms The permissions 
  */
-userSchema.methods.addPerm = async function ( perm )
+userSchema.methods.addPerm = async function ( perms )
 {
+    const user = this;
+
+    perms.forEach( perm => 
+    {
+        if ( perm in inverse )
+        {
+            user.roleId = user.roleId | +perm;
+        }
+    } );
+
+    user.save();
 
 };
 
 /**
- * Remove a permission from a user
- * @param {string} perm The permission 
+ * Remove  permissions from a user
+ * @param {Array} perms The permissions
  */
-userSchema.methods.removePerm = function ( perm )
+userSchema.methods.removePerm = function ( perms )
 {
 
 };

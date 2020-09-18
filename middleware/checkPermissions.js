@@ -7,13 +7,10 @@ const checkPermissions = ( permission ) => async ( req, res, next ) =>
 {
     try 
     {
-        const user = await User.findById( req.userId );
-
-        if ( user.permissions[ permissions[ permission ] ] || user.roleId === roles.SUPER_ADMIN )
+        const user = await User.findById( req.userId, "roleId" );
+        if ( !!( user.roleId & permission ) )
         {
-            console.log( user );
             return next();
-
         }
         throwErr(
             {
@@ -21,8 +18,6 @@ const checkPermissions = ( permission ) => async ( req, res, next ) =>
                 statusCode: 403
             }
         );
-
-
     }
     catch ( err ) 
     {

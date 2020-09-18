@@ -2,7 +2,8 @@
 //edit a Gem
 //delete a Gem
 import Gem from "../models/gem";
-import User from "../models/User";
+import User from "../models/user";
+import permissions from "../access/permissions";
 import { throwErr, catchErr, checkValidationErr, parseBool } from "../utils";
 
 const postGem = async ( req, res, next ) =>
@@ -72,7 +73,7 @@ const deleteGem = ( req, res, next ) =>
     res.json( { message: "delete" } );
 };
 
-const editUser = async ( req, res, next ) =>
+const addUserPermission = async ( req, res, next ) =>
 {
     const { id, perms } = req.body;
 
@@ -80,7 +81,7 @@ const editUser = async ( req, res, next ) =>
     {
         const userToEdit = await User.findById( id, "roleId permissions" );
 
-        console.log( userToEdit );
+        userToEdit.addPerm( perms );
 
         res.end();
     }
@@ -92,6 +93,11 @@ const editUser = async ( req, res, next ) =>
 
 };
 
+const getPermissions = ( req, res ) =>
+{
+    res.status( 200 ).json( permissions );
+};
+
 
 
 
@@ -101,5 +107,6 @@ export
     postGem,
     editGem,
     deleteGem,
-    editUser
+    addUserPermission,
+    getPermissions,
 };
