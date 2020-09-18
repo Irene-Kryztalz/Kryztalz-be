@@ -5,17 +5,17 @@ const gemSchema = new Schema( {
     {
         type: String,
         required: true,
+        lowercase: true
+
     },
     name:
     {
         type: String,
         required: true,
+        lowercase: true
     },
-    category:
-    {
-        type: String,
-        required: true,
-    },
+    isRough: Boolean,
+    cutType: String,
     weight:
     {
         type: Types.Decimal128,

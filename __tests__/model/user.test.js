@@ -7,13 +7,6 @@ import setUpDB from "../../setUpTests";
 
 setUpDB( "user-model" );
 
-//describe user model
-/**
- * it should hash user pwd
- * it should generate email token
- *
- */
-
 describe( "The User model", () =>
 {
     it( "should hash a user password", async () =>
@@ -34,9 +27,14 @@ describe( "The User model", () =>
         expect( createdUser.emailTokenExpires ).toBeTruthy();
         expect( createdUser.isValid ).not.toBeTruthy();
 
+        try 
+        {
+            await new User( user ).save();
+        }
+        catch ( error ) 
+        {
+            expect( error ).toBeTruthy();
+        }
 
     } );
 } );
-
-
-

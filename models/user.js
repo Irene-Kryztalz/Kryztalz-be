@@ -1,5 +1,8 @@
+// @ts-nocheck
 import { model, Schema } from "mongoose";
 import { hash } from "bcrypt";
+import { inverse } from "../access/permissions";
+import roles from "../access/roles";
 import { generateRandomToken } from "../utils";
 
 const userSchema = new Schema(
@@ -7,7 +10,9 @@ const userSchema = new Schema(
         email:
         {
             type: String,
-            required: true
+            required: true,
+            unique: true,
+            lowercase: true
         },
         name:
         {
@@ -39,7 +44,7 @@ const userSchema = new Schema(
                     gemId:
                     {
                         type: Schema.Types.ObjectId,
-                        ref: "Product",
+                        ref: "Gem",
                         required: true,
                     },
                     quantity:
@@ -52,8 +57,11 @@ const userSchema = new Schema(
         isVerified: Boolean,
         emailToken: String,
         emailTokenExpires: Date,
-        isAdmin: Boolean
-
+        roleId:
+        {
+            type: Number,
+            default: roles.NORMAL
+        }
     }
 );
 
@@ -70,19 +78,52 @@ userSchema.pre( 'save', async function ( next )
     if ( user.password && user.isModified( "password" ) )
     {
         const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
-
-        // @ts-ignore
         user.emailToken = generateRandomToken( 12 );
         user.emailTokenExpires = new Date( oneHr );
-
-        // @ts-ignore
         user.password = await hash( user.password, 12 );
 
     }
 
-
     next();
 } );
 
+/**
+ * Add a permissions to a user
+ * @param {Array} perms The permissions 
+ */
+userSchema.methods.addPerm = async function ( perms )
+{
+    const user = this;
+
+    perms.forEach( perm => 
+    {
+        if ( perm in inverse )
+        {
+            user.roleId = user.roleId | +perm;
+        }
+    } );
+
+    user.save();
+
+};
+
+/**
+ * Remove  permissions from a user
+ * @param {Array} perms The permissions
+ */
+userSchema.methods.removePerm = function ( perms )
+{
+    const user = this;
+
+    perms.forEach( perm => 
+    {
+        if ( perm in inverse && !!( user.roleId & perm ) )
+        {
+            user.roleId = user.roleId ^ +perm;
+        }
+    } );
+
+    user.save();
+};
 
 export default model( "User", userSchema );

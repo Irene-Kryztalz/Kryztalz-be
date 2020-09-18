@@ -1,43 +1,85 @@
-import User from "../models/user";
+import { format } from "url";
+import { port } from "../config";
+import { compare } from "bcrypt";
+import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
-import { validationResult } from "express-validator";
 
-import { sgKey, sender } from "../config";
-import { throwErr, catchErr, handleValidationErr } from "../utils";
+import User from "../models/user";
+import { sgKey, sender, jwtSecret } from "../config";
+import { throwErr, catchErr, checkValidationErr } from "../utils";
 
 sgMail.setApiKey( sgKey );
 
-const postSignIn = ( req, res, next ) =>
+const postSignIn = async ( req, res, next ) =>
 {
+    const { password, email } = req.body;
 
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
+
+    try 
+    {
+        const user = await User.findOne( { email: email.toLowerCase() } );
+        if ( !user || !user.isVerified )
+        {
+            const error =
+            {
+                message: "Invalid user"
+            };
+            throwErr( error );
+        }
+
+        // @ts-ignore
+        if ( !await compare( password, user.password ) )
+        {
+            const error =
+            {
+                message: "Email/Password mismatch"
+            };
+            throwErr( error );
+        }
+
+        const token = jwt.sign(
+            {
+                email,
+                userId: user._id.toString()
+            }, jwtSecret,
+            { expiresIn: "4h" }
+        );
+
+
+        res.status( 200 ).json( { user: { token, email } } );
+
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
 };
 
 const postSignUp = async ( req, res, next ) =>
 {
-    const { name, email, password, isAdmin } = req.body;
+    const { name, email, password } = req.body;
 
+    const errs = checkValidationErr( req );
 
-    const errors = validationResult( req );
-
-    if ( !errors.isEmpty() )
+    if ( errs )
     {
-
-        const errObj =
-        {
-            msg: "One or more fields are invalid",
-            data: errors.array()
-        };
-
-        return handleValidationErr( errObj, next );
+        return catchErr( errs, next );
     }
 
     const user = await new User(
         {
-            name, email, password,
+            name,
+            email: email.toLowerCase(),
+            password,
             wishlist: [],
             cart: [],
-            isVerified: false,
-            isAdmin
         } ).save();
 
     const response =
@@ -52,24 +94,35 @@ const postSignUp = async ( req, res, next ) =>
 
     res.status( 201 ).json( response );
 
-    const msg = {
-        to: email,
-        from: sender,
-        subject: "Krystalz",
-        html: `<a target="_blank" href="http://localhost:3031/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
-    };
+    const url = `${ format(
+        {
+            protocol: req.protocol,
+            host: req.hostname,
+        } ) }:${ port }/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }`;
+
+    //delete this later
+    console.log( `${ url }` );
 
     //send mail
-    sgMail.send( msg )
-        .then( () => { } )
-        .catch( error =>
-        {
-            console.error( error );
-            if ( error.response )
+    /*
+        const message = {
+            to: email,
+            from: sender,
+            subject: "Krystalz",
+            html: `<a target="_blank" href="${ url }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
+        };
+    
+        sgMail.send( message )
+            .then( () => { } )
+            .catch( error =>
             {
-                console.error( error.response.body );
-            }
-        } );
+                if ( error.response )
+                {
+                    console.error( "Mail sending failed" );
+                }
+            } );
+    
+            */
 
 };
 
@@ -91,15 +144,16 @@ const confirmEmail = async ( req, res, next ) =>
                 user.isVerified = true;
                 user.emailToken = undefined;
                 user.emailTokenExpires = undefined;
+
                 await user.save();
 
-                res.status( 200 ).json( { msg: "User verified" } );
+                res.status( 200 ).json( { message: "User verified" } );
             }
             else
             {
                 const error =
                 {
-                    msg: "Invalid Action. Unable to verify user",
+                    message: "Invalid Action. Unable to verify user",
                     statusCode: 403
                 };
                 throwErr( error );
@@ -110,12 +164,11 @@ const confirmEmail = async ( req, res, next ) =>
         {
             const error =
             {
-                msg: "Expired Token",
+                message: "Expired Token",
                 statusCode: 403
             };
             throwErr( error );
         }
-
 
     }
     catch ( error ) 
@@ -124,6 +177,7 @@ const confirmEmail = async ( req, res, next ) =>
     }
 
 };
+
 
 export
 {

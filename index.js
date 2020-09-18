@@ -5,7 +5,9 @@ import app from "./app";
 const options =
 {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    autoIndex: true,
+    useCreateIndex: true
 };
 
 connect( dbUrl, options )
@@ -16,7 +18,6 @@ connect( dbUrl, options )
         app.listen( port, () =>
         {
             console.log( `Server is listening at port ${ port }` );
-
         } );
 
     } )
