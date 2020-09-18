@@ -21,10 +21,8 @@ const postSignIn = async ( req, res, next ) =>
         return catchErr( errs, next );
     }
 
-
     try 
     {
-
         const user = await User.findOne( { email: email.toLowerCase() } );
         if ( !user || !user.isVerified )
         {
@@ -51,7 +49,7 @@ const postSignIn = async ( req, res, next ) =>
                 email,
                 userId: user._id.toString()
             }, jwtSecret,
-            { expiresIn: "10m" }
+            { expiresIn: "4h" }
         );
 
 
