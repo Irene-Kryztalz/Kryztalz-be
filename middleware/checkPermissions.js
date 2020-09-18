@@ -1,39 +1,32 @@
 import { throwErr, catchErr } from "../utils";
-import permissions from "../permissions";
+import roles from "../access/roles";
+import permissions from "../access/permissions";
 import User from "../models/user";
 
 const checkPermissions = ( permission ) => async ( req, res, next ) =>
 {
     try 
     {
+        const user = await User.findById( req.userId, "roleId permissions" );
 
-        const userPerms = await User.findById( req.userId );
-
-        const condition = ( userPerms.permissions[ permission ] || userPerms.permissions[ permissions.ALL ] ) && !userPerms.permissions[ permissions.NONE ];
-
-
-
-        if ( permissions[ permission ] && condition )
+        if ( user.permissions[ permissions[ permission ] ] || user.roleId === roles.SUPER_ADMIN )
         {
-            next();
+            console.log( user );
+            return next();
+
         }
-        else
-        {
-            const error =
+        throwErr(
             {
                 message: "Not allowed",
                 statusCode: 403
-            };
+            }
+        );
 
-            throwErr( error );
-        }
 
     }
-    catch ( error ) 
+    catch ( err ) 
     {
-
-        error.statusCode = 403;
-        return catchErr( error, next );
+        catchErr( err, next );
     }
 
 };

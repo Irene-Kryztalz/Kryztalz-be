@@ -3,10 +3,10 @@ import
 {
     postGem,
     editGem,
-    deleteGem
+    deleteGem,
+    editUser
 } from "../controllers/admin";
-import User from "../models/user";
-import permissions from "../permissions";
+import permissions from "../access/permissions";
 import checkAuth from "../middleware/checkAuth";
 import checkPermissions from "../middleware/checkPermissions";
 import fileUpload from "../middleware/fileUpload";
@@ -14,14 +14,10 @@ import fileUpload from "../middleware/fileUpload";
 const router = Router();
 
 
-router.post( "/gems", checkAuth, checkPermissions( permissions.WRITE ), fileUpload, postGem );
-router.put( "/gems:id", checkAuth, checkPermissions( permissions.WRITE ), fileUpload, editGem );
-router.delete( "/gems:id", checkAuth, deleteGem );
+router.post( "/gems", checkAuth, checkPermissions( permissions.ADD_GEM ), fileUpload, postGem );
+router.put( "/gems:id", checkAuth, checkPermissions( permissions.EDIT_GEM ), fileUpload, editGem );
+router.delete( "/gems:id", checkAuth, checkPermissions( permissions.DELETE_GEM ), deleteGem );
 
-router.post( "/gems/add", checkAuth, ( req, res, next ) =>
-{
-
-} );
-
+router.put( "/user", checkAuth, checkPermissions( permissions.EDIT_USER ), editUser );
 
 export default router;

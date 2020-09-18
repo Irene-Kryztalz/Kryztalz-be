@@ -1,8 +1,8 @@
 //add a Gem
 //edit a Gem
 //delete a Gem
-//view a specfic Gem
 import Gem from "../models/gem";
+import User from "../models/User";
 import { throwErr, catchErr, checkValidationErr, parseBool } from "../utils";
 
 const postGem = async ( req, res, next ) =>
@@ -13,7 +13,7 @@ const postGem = async ( req, res, next ) =>
     {
         throwErr( { message: "Invalid Images.\nNumber of images must be at least 1 and less than 5", statusCode: 400 } );
     }
-    checkValidationErr( req, next );
+    checkValidationErr( req );
 
     try 
     {
@@ -72,6 +72,26 @@ const deleteGem = ( req, res, next ) =>
     res.json( { message: "delete" } );
 };
 
+const editUser = async ( req, res, next ) =>
+{
+    const { id, perms } = req.body;
+
+    try 
+    {
+        const userToEdit = await User.findById( id, "roleId permissions" );
+
+        console.log( userToEdit );
+
+        res.end();
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+        res.end();
+    }
+
+};
+
 
 
 
@@ -80,5 +100,6 @@ export
 
     postGem,
     editGem,
-    deleteGem
+    deleteGem,
+    editUser
 };

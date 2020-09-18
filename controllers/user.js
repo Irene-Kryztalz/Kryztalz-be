@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 
 import User from "../models/user";
-import permissions from "../permissions";
 import { sgKey, sender, jwtSecret } from "../config";
 import { throwErr, catchErr, checkValidationErr } from "../utils";
 
@@ -84,16 +83,6 @@ const postSignUp = async ( req, res, next ) =>
             password,
             wishlist: [],
             cart: [],
-            permissions:
-            {
-                [ permissions.READ ]: true,
-                [ permissions.WRITE ]: false,
-                [ permissions.DELETE ]: false,
-                [ permissions.NONE ]: false,
-                [ permissions.ALL ]: false
-            }
-
-
         } ).save();
 
     const response =

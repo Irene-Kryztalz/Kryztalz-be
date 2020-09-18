@@ -1,7 +1,25 @@
+// @ts-nocheck
 import { model, Schema } from "mongoose";
 import { hash } from "bcrypt";
-import permissions from "../permissions";
+import permissions from "../access/permissions";
+import roles from "../access/roles";
 import { generateRandomToken } from "../utils";
+
+function defaultPermissions ()
+{
+    return (
+        {
+            [ permissions.ADD_GEM ]: false,
+            [ permissions.READ_GEM ]: true,
+            [ permissions.EDIT_GEM ]: false,
+            [ permissions.DELETE_GEM ]: false,
+            [ permissions.ADD_USER ]: false,
+            [ permissions.READ_USER ]: false,
+            [ permissions.EDIT_USER ]: false,
+            [ permissions.DELETE_USER ]: false,
+        }
+    );
+}
 
 const userSchema = new Schema(
     {
@@ -9,7 +27,8 @@ const userSchema = new Schema(
         {
             type: String,
             required: true,
-            unique: true
+            unique: true,
+            lowercase: true
         },
         name:
         {
@@ -41,7 +60,7 @@ const userSchema = new Schema(
                     gemId:
                     {
                         type: Schema.Types.ObjectId,
-                        ref: "Product",
+                        ref: "Gem",
                         required: true,
                     },
                     quantity:
@@ -54,10 +73,17 @@ const userSchema = new Schema(
         isVerified: Boolean,
         emailToken: String,
         emailTokenExpires: Date,
+        roleId:
+        {
+            type: Number,
+            default: roles.NORMAL
+        },
         permissions:
         {
-            type: Object
+            type: Schema.Types.Mixed,
+            default: defaultPermissions
         }
+
 
     }
 );
@@ -75,11 +101,8 @@ userSchema.pre( 'save', async function ( next )
     if ( user.password && user.isModified( "password" ) )
     {
         const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
-        // @ts-ignore
         user.emailToken = generateRandomToken( 12 );
         user.emailTokenExpires = new Date( oneHr );
-
-        // @ts-ignore
         user.password = await hash( user.password, 12 );
 
     }
@@ -93,17 +116,7 @@ userSchema.pre( 'save', async function ( next )
  */
 userSchema.methods.addPerm = async function ( perm )
 {
-    if ( perm in permissions )
-    {
-        let user = this;
-        user.permissions[ perm ] = true;
-        return user.save();
-    }
-    else
-    {
-        const msg = `Cannot add permission ${ perm } to the user`;
-        throw Error( msg );
-    }
+
 };
 
 /**
@@ -112,17 +125,7 @@ userSchema.methods.addPerm = async function ( perm )
  */
 userSchema.methods.removePerm = function ( perm )
 {
-    if ( permissions[ perm ] )
-    {
-        const user = this;
-        user.permissions[ perm ] = false;
-        return user.save();
-    }
-    else
-    {
-        throw Error( `Cannot remove permission ${ perm } from user` );
-    }
-};
 
+};
 
 export default model( "User", userSchema );

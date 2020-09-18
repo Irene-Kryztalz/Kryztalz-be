@@ -64,7 +64,7 @@ describe( 'Test sign in process', () =>
     it( "should verify that the user signed in with correct details", async done =>
     {
 
-        const userA = await User.create( users[ 0 ] );
+        const userA = await new User( users[ 0 ] ).save();
 
         await request.get( `/user/confirm-email?id=${ userA._id }&emailToken=${ userA.emailToken }` );
 
@@ -81,7 +81,7 @@ describe( 'Test sign in process', () =>
     it( "should not sign user in", async ( done ) => 
     {
 
-        const userB = await User.create( users[ 1 ] );
+        const userB = await new User( users[ 1 ] ).save();
 
         const res = await request.post( '/user/signin' )
             .send( { email: userB.email, password: userB.password } );

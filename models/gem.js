@@ -5,11 +5,14 @@ const gemSchema = new Schema( {
     {
         type: String,
         required: true,
+        lowercase: true
+
     },
     name:
     {
         type: String,
         required: true,
+        lowercase: true
     },
     isRough: Boolean,
     cutType: String,
