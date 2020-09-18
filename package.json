@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "start": "nodemon --exec babel-node index"
+    "start": "--exec babel-node index",
+    "start-dev": "nodemon --exec babel-node index"
   },
   "jest": {
     "testEnvironment": "node",
