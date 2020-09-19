@@ -4,7 +4,14 @@ import { body, query } from "express-validator";
 import User from "../models/user";
 
 
-import { postSignUp, postSignIn, confirmEmail } from "../controllers/user";
+import 
+{
+    postSignUp,
+    postSignIn,
+    confirmEmail,
+    troubleConfirm
+}
+    from "../controllers/user";
 
 const router = Router();
 
@@ -68,6 +75,13 @@ router.get( "/confirm-email",
             .trim()
             .notEmpty()
     ], confirmEmail );
+
+router.get( "/trouble-account",
+    [
+        query( "id", "User id is invalid" )
+            .trim()
+            .notEmpty(),
+    ], troubleConfirm );
 
 
 export default router;
