@@ -1,14 +1,32 @@
-import { format } from "url";
-import { port } from "../config";
 import { compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import sgMail from "@sendgrid/mail";
 
 import User from "../models/user";
-import { sgKey, sender, jwtSecret } from "../config";
-import { throwErr, catchErr, checkValidationErr } from "../utils";
+import { sgKey, sender, jwtSecret, email_confirm_template, email_trouble_template } from "../config";
+import { throwErr, catchErr, checkValidationErr, generateRandomToken } from "../utils";
 
 sgMail.setApiKey( sgKey );
+
+function sendMail ( { to, template, data } )
+{
+    const message = {
+        to,
+        from: sender,
+        templateId: template,
+        dynamic_template_data: data
+    };
+
+    sgMail.send( message )
+        .then( () => { } )
+        .catch( error =>
+        {
+            if ( error.response )
+            {
+                console.error( `Unable to send mail to ${ to }` );
+            }
+        } );
+}
 
 const postSignIn = async ( req, res, next ) =>
 {
@@ -94,47 +112,56 @@ const postSignUp = async ( req, res, next ) =>
 
     res.status( 201 ).json( response );
 
-    const url = `${ format(
-        {
-            protocol: req.protocol,
-            host: req.hostname,
-        } ) }:${ port }/user/confirm-email?id=${ user._id }&emailToken=${ user.emailToken }`;
 
-    //delete this later
-    console.log( `${ url }` );
+    const url = `${ req.headers.origin }/verify-account?id=${ user._id }&emailToken=${ user.emailToken }`;
+
+    //console.log( url );
 
     //send mail
-    /*
-        const message = {
-            to: email,
-            from: sender,
-            subject: "Krystalz",
-            html: `<a target="_blank" href="${ url }">Confirm email.</a> <p> This link will expire in 1hr <p>`,
-        };
-    
-        sgMail.send( message )
-            .then( () => { } )
-            .catch( error =>
+
+
+
+    sendMail(
+        {
+            to: user.email,
+            template: email_confirm_template,
+            data:
             {
-                if ( error.response )
-                {
-                    console.error( "Mail sending failed" );
-                }
-            } );
-    
-            */
+                name: user.name,
+                url
+            }
+        }
+    );
+
+
+
 
 };
 
 const confirmEmail = async ( req, res, next ) =>
 {
     const { id, emailToken } = req.query;
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
 
     try 
     {
         const user = await User.findById( id );
 
-        if ( user.emailToken )
+        if ( user.isVerified )
+        {
+            const error =
+            {
+                message: "This account has already been confirmed",
+                statusCode: 403
+            };
+            throwErr( error );
+        }
+        else if ( user.emailToken )
         {
             const timeLeft = user.emailTokenExpires.getTime() - new Date().getTime();
 
@@ -178,10 +205,64 @@ const confirmEmail = async ( req, res, next ) =>
 
 };
 
+const troubleConfirm = async ( req, res, next ) =>
+{
+    const { id } = req.query;
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
+
+    try 
+    {
+        const user = await User.findById( id );
+
+        if ( user.isVerified )
+        {
+            res.json( { message: "User has already been verified" } );
+        }
+        else 
+        {
+
+            user.emailToken = generateRandomToken( 12 );
+            const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
+            user.emailTokenExpires = new Date( oneHr );
+
+            await user.save();
+
+            const url = `${ req.headers.origin }/verify-account?id=${ user._id }&emailToken=${ user.emailToken }`;
+
+            res.json( { message: "User has been sent another token" } );
+
+
+            sendMail(
+                {
+                    to: user.email,
+                    template: email_trouble_template,
+                    data:
+                    {
+                        name: user.name,
+                        url
+                    }
+                }
+            );
+        }
+
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+};
+
 
 export
 {
     postSignIn,
     postSignUp,
-    confirmEmail
+    confirmEmail,
+    troubleConfirm
 };

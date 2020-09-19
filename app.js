@@ -2,12 +2,30 @@ import path from "path";
 import cors from 'cors';
 import express from "express";
 import { json } from "body-parser";
+
+import { origin } from "./config";
 import userRoutes from "./routes/user";
 import adminRoutes from "./routes/admin";
 
 const app = express();
 
-app.use( cors() );
+var whitelist = [ origin, "http://localhost:3000" ];
+
+const corsOptions =
+{
+    origin: function ( origin, callback )
+    {
+        if ( whitelist.indexOf( origin ) !== -1 || !origin )
+        {
+            callback( null, true );
+        } else
+        {
+            callback( new Error( 'Not allowed by CORS' ) );
+        }
+    }
+};
+
+app.use( cors( corsOptions ) );
 app.use( json() );
 
 app.use( "/images", express.static( path.join( __dirname, "images" ) ) );
