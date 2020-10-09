@@ -11,11 +11,13 @@ const port = process.env.PORT || 8080,
     sgKey = process.env.SENDGRID_API_KEY,
     email_trouble_template = process.env.EMAIL_TROUBLE_TEMPLATE,
     email_confirm_template = process.env.EMAIL_C0NFIRM_TEMPLATE,
+    admin_origin = process.env.ALLOWED_ORIGIN_ADMIN,
     origin = process.env.ALLOWED_ORIGIN;
 
 export
 {
     origin,
+    admin_origin,
     email_confirm_template,
     email_trouble_template,
     jwtSecret,
