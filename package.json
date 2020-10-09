@@ -7,7 +7,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "start": "babel-node index",
-    "start-dev": "nodemon --exec babel-node index"
+    "dev": "nodemon --exec babel-node index"
   },
   "jest": {
     "testEnvironment": "node",

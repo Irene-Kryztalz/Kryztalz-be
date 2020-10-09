@@ -3,6 +3,7 @@ import "core-js/stable";
 import "regenerator-runtime/runtime";
 import supertest from "supertest";
 import jwt from "jsonwebtoken";
+import sgMail from "@sendgrid/mail";
 
 import { jwtSecret } from "../../config";
 import { deleteFiles } from "../../utils";
@@ -11,6 +12,9 @@ import setUpDB from "../../setUpTests";
 import app from "../../app";
 import User from "../../models/user";
 import roles from "../../access/roles";
+
+jest.mock( "@sendgrid/mail" );
+
 
 const request = supertest( app );
 setUpDB( "admin-endpoint" );

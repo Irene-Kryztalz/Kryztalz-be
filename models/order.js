@@ -21,15 +21,13 @@ const orderSchema = new Schema(
             type: Date,
             required: true
         },
-        user:
+        userId:
         {
-            userId:
-            {
-                type: Schema.Types.ObjectId,
-                required: true,
-                ref: 'User'
-            }
+            type: Schema.Types.ObjectId,
+            required: true,
+            ref: 'User'
         }
+
 
     }
 );

@@ -61,6 +61,7 @@ const postSignIn = async ( req, res, next ) =>
             throwErr( error );
         }
 
+        const fourH = 1000 * 60 * 60 * 4;
         const token = jwt.sign(
             {
                 email,
@@ -70,7 +71,14 @@ const postSignIn = async ( req, res, next ) =>
         );
 
 
-        res.status( 200 ).json( { user: { token, email } } );
+        res.status( 200 ).json( {
+            user:
+            {
+                token,
+                email,
+                expires: ( fourH + new Date().getTime() )
+            }
+        } );
 
 
     }
@@ -115,24 +123,24 @@ const postSignUp = async ( req, res, next ) =>
 
     const url = `${ req.headers.origin }/verify-account?id=${ user._id }&emailToken=${ user.emailToken }`;
 
-    //console.log( url );
+    console.log( url );
 
     //send mail
 
 
-
-    sendMail(
-        {
-            to: user.email,
-            template: email_confirm_template,
-            data:
+    /*
+        sendMail(
             {
-                name: user.name,
-                url
+                to: user.email,
+                template: email_confirm_template,
+                data:
+                {
+                    name: user.name,
+                    url
+                }
             }
-        }
-    );
-
+        );
+     */
 
 
 
@@ -227,7 +235,7 @@ const troubleConfirm = async ( req, res, next ) =>
         {
 
             user.emailToken = generateRandomToken( 12 );
-            const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
+            const oneHr = new Date().getTime() + ( 60 * 60 * 1000 );
             user.emailTokenExpires = new Date( oneHr );
 
             await user.save();

@@ -9,7 +9,7 @@ import adminRoutes from "./routes/admin";
 
 const app = express();
 
-var whitelist = [ origin, "http://localhost:3000" ];
+var whitelist = [ origin, "http://localhost:3000", "http://localhost:3001" ];
 
 const corsOptions =
 {

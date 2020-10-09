@@ -27,7 +27,7 @@ it( 'Should save user to database', async done =>
 {
     const user =
     {
-        name: "Naruto",
+        name: "naruto",
         email: "ramen_hokage@gmail.com",
         password: "testing99",
         confirmPassword: "testing99"
@@ -54,14 +54,14 @@ describe( 'Test sign in process', () =>
     {
         verified = await User.insertMany( [
             {
-                name: "Levi",
+                name: "levi",
                 email: "humanity_strongest@gmail.com",
                 password: await hash( "testing123", 12 ),
                 isVerified: true,
                 roleId: roles.SUPER_ADMIN
             },
             {
-                name: "Naruto",
+                name: "naruto",
                 email: "ramen_hokage@gmail.com",
                 password: await hash( "testing123", 12 ),
                 isVerified: true,
