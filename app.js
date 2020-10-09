@@ -3,13 +3,13 @@ import cors from 'cors';
 import express from "express";
 import { json } from "body-parser";
 
-import { origin } from "./config";
+import { origin, admin_origin } from "./config";
 import userRoutes from "./routes/user";
 import adminRoutes from "./routes/admin";
 
 const app = express();
 
-var whitelist = [ origin, "http://localhost:3000", "http://localhost:3001" ];
+const whitelist = [ origin, admin_origin, "http://localhost:3000", "http://localhost:3001" ];
 
 const corsOptions =
 {
