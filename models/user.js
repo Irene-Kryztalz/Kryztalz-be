@@ -17,7 +17,8 @@ const userSchema = new Schema(
         name:
         {
             type: String,
-            required: true
+            required: true,
+            lowercase: true
         },
         password:
         {
@@ -77,7 +78,7 @@ userSchema.pre( 'save', async function ( next )
 
     if ( user.password && user.isModified( "password" ) )
     {
-        const oneHr = new Date().getTime() + ( 24 * 60 * 60 * 1000 );
+        const oneHr = new Date().getTime() + ( 60 * 60 * 1000 );
         user.emailToken = generateRandomToken( 12 );
         user.emailTokenExpires = new Date( oneHr );
         user.password = await hash( user.password, 12 );
