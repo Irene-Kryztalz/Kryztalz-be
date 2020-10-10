@@ -14,13 +14,7 @@ const gemSchema = new Schema( {
         required: true,
         lowercase: true
     },
-    isRough: Boolean,
     cutType: String,
-    weight:
-    {
-        type: Types.Decimal128,
-        required: true
-    },
     price:
     {
         type: Types.Decimal128,

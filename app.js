@@ -54,7 +54,7 @@ app.use( ( req, res, next ) =>
 
 app.use( ( error, req, res, next ) =>
 {
-
+    console.log( 8 );
     const message = error.message;
     const status = error.statusCode || 500;
     let data = error.data;

@@ -10,26 +10,21 @@ const postGem = async ( req, res, next ) =>
 {
     const images = req.files;
 
+
     if ( images.length < 1 || images.length > 4 )
     {
-        throwErr( { message: "Invalid Images.\nNumber of images must be at least 1 and less than 5", statusCode: 400 } );
+        const error =
+        {
+            message: "Invalid Images.\nNumber of images must be at least 1 and less than 5",
+            data: []
+        };
+        return catchErr( error, next );
     }
     checkValidationErr( req );
 
     try 
     {
-        let { type, name, isRough, cutType, weight, price, description } = req.body;
-
-        isRough = isRough === "";
-
-        if ( parseBool( isRough ) )
-        {
-            cutType = "";
-        }
-        else
-        {
-            isRough = false;
-        }
+        let { type, name, cutType, price, description } = req.body;
 
         const imageUrls = images.map( img => 
         {
@@ -45,8 +40,6 @@ const postGem = async ( req, res, next ) =>
                 type: type.toLowerCase(),
                 name: name.toLowerCase(),
                 cutType: cutType.toLowerCase(),
-                isRough,
-                weight,
                 price, description, imageUrls
             }
         ).save();
