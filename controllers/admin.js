@@ -20,7 +20,13 @@ const postGem = async ( req, res, next ) =>
         };
         return catchErr( error, next );
     }
-    checkValidationErr( req );
+
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
 
     try 
     {

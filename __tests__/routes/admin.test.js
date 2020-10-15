@@ -111,7 +111,7 @@ describe( 'The POST gem process', () =>
             .field( "description", gemConfig.description )
             .attach( "photos", resolve( __dirname, gemConfig.file ) );
 
-        expect( res.body.message ).toBeTruthy();
+        expect( res.body.error ).toBeTruthy();
         done();
 
     } );
