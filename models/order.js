@@ -7,7 +7,11 @@ const orderSchema = new Schema(
                 {
                     _id: false,
                     gem: { type: Object, required: true },
-                    quantity: { type: Number, required: true }
+                    quantity:
+                    {
+                        type: Number,
+                        required: true
+                    }
                 }
 
             ],

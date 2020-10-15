@@ -76,9 +76,7 @@ describe( 'The POST gem process', () =>
             .set( "Authorization", `Bearer ${ token }` )
             .field( "name", gemConfig.name )
             .field( "type", gemConfig.type )
-            .field( "isRough", gemConfig.isRough )
             .field( "cutType", gemConfig.cutType )
-            .field( "weight", gemConfig.weight )
             .field( "price", gemConfig.price )
             .field( "description", gemConfig.description )
             .attach( "photos", resolve( __dirname, gemConfig.file ) );
@@ -108,14 +106,12 @@ describe( 'The POST gem process', () =>
             .set( "Authorization", `Bearer ${ token }` )
             .field( "name", gemConfig.name )
             .field( "type", gemConfig.type )
-            .field( "isRough", gemConfig.isRough )
             .field( "cutType", gemConfig.cutType )
-            .field( "weight", gemConfig.weight )
             .field( "price", gemConfig.price )
             .field( "description", gemConfig.description )
             .attach( "photos", resolve( __dirname, gemConfig.file ) );
 
-        expect( res.body.message ).toBeTruthy();
+        expect( res.body.error ).toBeTruthy();
         done();
 
     } );

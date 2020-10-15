@@ -99,49 +99,56 @@ const postSignUp = async ( req, res, next ) =>
         return catchErr( errs, next );
     }
 
-    const user = await new User(
-        {
-            name,
-            email: email.toLowerCase(),
-            password,
-            wishlist: [],
-            cart: [],
-        } ).save();
 
-    const response =
+    try 
     {
-        message: "User created",
-        user:
-        {
-            name: user.name,
-            email: user.email
-        }
-    };
-
-    res.status( 201 ).json( response );
-
-
-    const url = `${ req.headers.origin }/verify-account?id=${ user._id }&emailToken=${ user.emailToken }`;
-
-    console.log( url );
-
-    //send mail
-
-
-    /*
-        sendMail(
+        const user = await new User(
             {
-                to: user.email,
-                template: email_confirm_template,
-                data:
-                {
-                    name: user.name,
-                    url
-                }
-            }
-        );
-     */
+                name: name.toLowerCase(),
+                email: email.toLowerCase(),
+                password,
+                wishlist: [],
+                cart: [],
+            } ).save();
 
+        const response =
+        {
+            message: "User created",
+            user:
+            {
+                name: user.name,
+                email: user.email
+            }
+        };
+
+        res.status( 201 ).json( response );
+
+        const url = `${ req.headers.origin }/verify-account?id=${ user._id }&emailToken=${ user.emailToken }`;
+
+        console.log( url );
+
+        //send mail
+
+
+        /*
+            sendMail(
+                {
+                    to: user.email,
+                    template: email_confirm_template,
+                    data:
+                    {
+                        name: user.name,
+                        url
+                    }
+                }
+            );
+         */
+
+
+    } catch ( error ) 
+    {
+        catchErr( error, next );
+    }
 
 
 };
