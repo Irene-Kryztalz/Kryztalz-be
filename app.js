@@ -39,7 +39,7 @@ app.get( "/favicon.ico", ( req, res ) =>
 app.use( "/user", userRoutes );
 app.use( "/admin", adminRoutes );
 
-app.get( '/test', async ( req, res ) =>
+app.get( [ "/", '/test' ], async ( req, res ) =>
 {
     res.json( { message: 'Server is online!' } );
 } );
