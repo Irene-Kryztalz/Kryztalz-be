@@ -14,7 +14,12 @@ export const gemSchema = new Schema( {
         required: true,
         lowercase: true
     },
-    cutType: String,
+    cutType:
+    {
+        type: String,
+        required: true,
+        lowercase: true
+    },
     price:
     {
         type: Types.Decimal128,
@@ -35,5 +40,22 @@ export const gemSchema = new Schema( {
         required: true,
     }
 } );
+
+gemSchema.set( 'toJSON',
+    {
+        transform: ( doc, ret ) =>
+        {
+            ret.price = +ret.price.toString();
+            ret.__v = undefined;
+            return ret;
+        },
+    } );
+
+gemSchema.index(
+    {
+        name: 'text',
+        type: 'text',
+        cutType: 'text'
+    } );
 
 export default model( "Gems", gemSchema );
