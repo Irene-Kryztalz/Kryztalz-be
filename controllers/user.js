@@ -99,7 +99,6 @@ const postSignUp = async ( req, res, next ) =>
         return catchErr( errs, next );
     }
 
-
     try 
     {
         const user = await new User(

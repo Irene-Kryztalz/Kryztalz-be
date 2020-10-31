@@ -4,7 +4,7 @@
 import Gem from "../models/gem";
 import User from "../models/user";
 import permissions from "../access/permissions";
-import { throwErr, catchErr, checkValidationErr, parseBool } from "../utils";
+import { throwErr, catchErr, checkValidationErr } from "../utils";
 
 const postGem = async ( req, res, next ) =>
 {
@@ -41,6 +41,7 @@ const postGem = async ( req, res, next ) =>
             return img.path;
         } );
 
+
         const gem = await new Gem(
             {
                 type: type.toLowerCase(),
@@ -50,7 +51,7 @@ const postGem = async ( req, res, next ) =>
             }
         ).save();
 
-        res.status( 201 ).json( gem );
+        res.status( 201 ).json( { ...gem._doc, price } );
     }
     catch ( error ) 
     {
@@ -78,11 +79,11 @@ const addUserPermission = async ( req, res, next ) =>
 
     try 
     {
-        const userToEdit = await User.findById( id, "roleId permissions" );
+        const userToEdit = await User.findById( id, "name email roleId" );
 
-        userToEdit.addPerm( perms );
+        await userToEdit.addPerm( perms );
 
-        res.end();
+        res.json( userToEdit );
     }
     catch ( error ) 
     {
@@ -98,11 +99,11 @@ const removeUserPermission = async ( req, res, next ) =>
 
     try 
     {
-        const userToEdit = await User.findById( id, "roleId permissions" );
+        const userToEdit = await User.findById( id, "name email roleId" );
 
-        userToEdit.removePerm( perms );
+        await userToEdit.removePerm( perms );
 
-        res.end();
+        res.json( userToEdit );
     }
     catch ( error ) 
     {
@@ -117,6 +118,37 @@ const getPermissions = ( req, res ) =>
     res.status( 200 ).json( permissions );
 };
 
+const getUser = async ( req, res, next ) =>
+{
+    const { email } = req.body;
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
+
+    try 
+    {
+        const user = await User.findOne( { email }, 'name email roleId' );
+
+        if ( !user )
+        {
+            const error =
+            {
+                message: "Unable to find user",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        res.status( 200 ).json( user );
+
+    } catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+};
 
 
 
@@ -126,6 +158,7 @@ export
     postGem,
     editGem,
     deleteGem,
+    getUser,
     getPermissions,
     addUserPermission,
     removeUserPermission,

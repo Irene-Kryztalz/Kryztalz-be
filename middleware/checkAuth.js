@@ -43,6 +43,7 @@ const checkAuth = ( req, res, next ) =>
 
     // @ts-ignore
     req.userId = decodedToken.userId;
+
     next();
 
 };
