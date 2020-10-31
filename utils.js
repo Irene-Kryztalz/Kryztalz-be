@@ -24,7 +24,7 @@ const catchErr = ( err, next ) =>
  * @param {Object} errConfig Error message configuratons.
  * @param {string} errConfig.message Error message.
  * @param {array} [errConfig.data = []] Data about the error.
- * @param {number} [errConfig.statusCode = 422] Error status code, default is 422.
+ * @param {number} [errConfig.statusCode = 401] Error status code, default is 401.
  */
 const throwErr = ( { message, data = [], statusCode = 401 } ) =>
 {
@@ -34,19 +34,6 @@ const throwErr = ( { message, data = [], statusCode = 401 } ) =>
 
     throw error;
 };
-
-
-
-/**
- * Catch error for bad requests from client (status code 4XX)
- * @param {Object} errConfig Error message configuratons.
- * @param {string} errConfig.message Error message.
- * @param {array} [errConfig.data = []] Data about the error.
- * @param {number} [errConfig.statusCode = 422] Error status 
- * code, default is 422.
- *
- * @param {function} next Call next middleware
- */
 
 
 /**
@@ -66,7 +53,7 @@ const checkValidationErr = ( req ) =>
         {
             message: "One or more fields are invalid",
             data: errors.array(),
-            statusCode: 401
+            statusCode: 400
         };
         return error;
     }

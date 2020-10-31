@@ -1,6 +1,6 @@
 import { model, Schema, Types } from "mongoose";
 
-const gemSchema = new Schema( {
+export const gemSchema = new Schema( {
     type:
     {
         type: String,

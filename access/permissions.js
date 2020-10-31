@@ -6,7 +6,7 @@ const permissions =
     DELETE_GEM: 8,    // 00001000
     ADD_USER: 16,     // 00010000
     READ_USER: 32,    // 00100000
-    EDIT_USER: 62,    // 01000000
+    EDIT_USER: 64,    // 01000000
     DELETE_USER: 128, // 10000000
 
 };

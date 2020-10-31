@@ -1,4 +1,5 @@
 import { model, Schema, Types } from "mongoose";
+import { gemSchema } from "./gem";
 
 const orderSchema = new Schema(
     {
@@ -6,7 +7,7 @@ const orderSchema = new Schema(
             [
                 {
                     _id: false,
-                    gem: { type: Object, required: true },
+                    gem: gemSchema,
                     quantity:
                     {
                         type: Number,

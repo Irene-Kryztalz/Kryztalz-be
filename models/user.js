@@ -32,12 +32,10 @@ const userSchema = new Schema(
                     gemId:
                     {
                         type: Schema.Types.ObjectId,
-                        ref: "Gem",
-                        required: true,
+                        ref: "Gem"
                     },
                 }
             ],
-
         cart:
             [
                 {
@@ -45,14 +43,9 @@ const userSchema = new Schema(
                     gemId:
                     {
                         type: Schema.Types.ObjectId,
-                        ref: "Gem",
-                        required: true,
+                        ref: "Gem"
                     },
-                    quantity:
-                    {
-                        type: Number,
-                        required: true,
-                    },
+                    quantity: Number
                 }
             ],
         isVerified: Boolean,
@@ -92,7 +85,7 @@ userSchema.pre( 'save', async function ( next )
  * Add a permissions to a user
  * @param {Array} perms The permissions 
  */
-userSchema.methods.addPerm = async function ( perms )
+userSchema.methods.addPerm = async function ( perms = [] )
 {
     const user = this;
 
@@ -112,7 +105,7 @@ userSchema.methods.addPerm = async function ( perms )
  * Remove  permissions from a user
  * @param {Array} perms The permissions
  */
-userSchema.methods.removePerm = function ( perms )
+userSchema.methods.removePerm = async function ( perms = [] )
 {
     const user = this;
 

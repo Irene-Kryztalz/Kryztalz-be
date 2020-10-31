@@ -1,9 +1,11 @@
 import { Router } from "express";
+import { body } from "express-validator";
 import
 {
     postGem,
     editGem,
     deleteGem,
+    getUser,
     getPermissions,
     addUserPermission,
     removeUserPermission
@@ -20,8 +22,17 @@ router.post( "/gems", checkAuth, checkPermissions( permissions.ADD_GEM ), fileUp
 router.put( "/gems:id", checkAuth, checkPermissions( permissions.EDIT_GEM ), fileUpload, editGem );
 router.delete( "/gems:id", checkAuth, checkPermissions( permissions.DELETE_GEM ), deleteGem );
 
+
+router.post( "/user", checkAuth,
+    [
+        body( "email", "Invalid Email" )
+            .trim()
+            .normalizeEmail()
+            .isEmail()
+    ], getUser );
+
 router.put( "/add-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), addUserPermission );
 router.put( "/remove-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), removeUserPermission );
-router.get( "/get-permissions", checkAuth, checkPermissions( permissions.READ_USER ), getPermissions );
+router.get( "/permissions", checkAuth, getPermissions );
 
 export default router;
