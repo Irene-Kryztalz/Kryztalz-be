@@ -5,8 +5,10 @@ import
 {
     addToCart,
     addToWishList,
-    purchaseItems,
-    getAllProducts
+    getAllGems,
+    getAllFilteredGems,
+    getOneGem,
+    searchAllGems
 }
     from "../controllers/shop";
 
@@ -14,7 +16,10 @@ const router = Router();
 
 router.post( "/cart", checkAuth, addToCart );
 router.post( "/wishlist", checkAuth, addToWishList );
-router.get( "/gems", checkAuth, getAllProducts );
-router.post( "/purchase", checkAuth, purchaseItems );
+
+router.get( "/search", searchAllGems );
+router.get( "/gems/filter", getAllFilteredGems );
+router.get( "/gems/:gemId", getOneGem );
+router.get( "/gems", getAllGems );
 
 export default router;

@@ -1,9 +1,10 @@
-//add a Gem
-//edit a Gem
-//delete a Gem
+import jwt from "jsonwebtoken";
+import { compare } from "bcrypt";
 import Gem from "../models/gem";
 import User from "../models/user";
 import permissions from "../access/permissions";
+
+import { jwtSecret } from "../config";
 import { throwErr, catchErr, checkValidationErr } from "../utils";
 
 const postGem = async ( req, res, next ) =>
@@ -51,7 +52,7 @@ const postGem = async ( req, res, next ) =>
             }
         ).save();
 
-        res.status( 201 ).json( { ...gem._doc, price } );
+        res.status( 201 ).json( gem );
     }
     catch ( error ) 
     {
@@ -61,16 +62,29 @@ const postGem = async ( req, res, next ) =>
 
 };
 
-const editGem = ( req, res, next ) =>
+const editGem = async ( req, res, next ) =>
 {
 
     res.json( { message: "edit" } );
 };
 
-const deleteGem = ( req, res, next ) =>
+const deleteGem = async ( req, res, next ) =>
 {
 
-    res.json( { message: "delete" } );
+    const { gemId } = req.params;
+
+    try 
+    {
+        await Gem.findByIdAndDelete( gemId );
+
+        res.json( { message: `Gem ${ gemId } successfully deleted` } );
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+
+
 };
 
 const addUserPermission = async ( req, res, next ) =>
@@ -150,16 +164,94 @@ const getUser = async ( req, res, next ) =>
     }
 };
 
+const postSignIn = async ( req, res, next ) =>
+{
+    const { password, email } = req.body;
 
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
+
+    try 
+    {
+        const user = await User.findOne( { email: email.toLowerCase() } );
+        if ( !user || !user.isVerified )
+        {
+            const error =
+            {
+                message: "Invalid user"
+            };
+            throwErr( error );
+        }
+
+        // @ts-ignore
+        if ( !await compare( password, user.password ) )
+        {
+            const error =
+            {
+                message: "Email/Password mismatch"
+            };
+            throwErr( error );
+        }
+
+        const fourH = 1000 * 60 * 60 * 4;
+        const token = jwt.sign(
+            {
+                userId: user._id.toString()
+            }, jwtSecret,
+            { expiresIn: "4h" }
+        );
+
+
+        res.status( 200 ).json( {
+            user:
+            {
+                token,
+                email,
+                role: user.roleId,
+                expires: ( fourH + new Date().getTime() )
+            }
+        } );
+
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+};
+
+const getOverview = async ( req, res, next ) =>
+{
+    //total number of gems
+    //num of admin that can add gems
+    //gem distributions by existence
+    //gem distributions by sales/orders
+    //
+
+    try 
+    {
+        res.json();
+    }
+    catch ( error )
+    {
+
+    }
+
+};
 
 export
 {
-
     postGem,
     editGem,
     deleteGem,
     getUser,
+    postSignIn,
     getPermissions,
     addUserPermission,
     removeUserPermission,
+    getOverview
 };

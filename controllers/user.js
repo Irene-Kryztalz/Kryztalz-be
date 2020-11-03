@@ -64,7 +64,6 @@ const postSignIn = async ( req, res, next ) =>
         const fourH = 1000 * 60 * 60 * 4;
         const token = jwt.sign(
             {
-                email,
                 userId: user._id.toString()
             }, jwtSecret,
             { expiresIn: "4h" }
@@ -76,6 +75,8 @@ const postSignIn = async ( req, res, next ) =>
             {
                 token,
                 email,
+                wishlist: user.wishlist,
+                cart: user.cart,
                 expires: ( fourH + new Date().getTime() )
             }
         } );
