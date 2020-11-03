@@ -1,6 +1,5 @@
 import Gem from "../models/gem";
 import User from "../models/user";
-import Order from "../models/order";
 import { throwErr, catchErr } from "../utils";
 
 const ITEM_PER_PAGE = 10;
@@ -44,11 +43,21 @@ const getAllGems = async ( req, res, next ) =>
 const getOneGem = async ( req, res, next ) =>
 {
     const { gemId } = req.params;
-
     try 
     {
         const gem = await Gem.findById( gemId );
-        res.json( gem );
+        if ( gem )
+        {
+            res.json( gem );
+        }
+        else
+        {
+            throwErr(
+                {
+                    message: "Unable to find this gem",
+                    statusCode: 404
+                } );
+        }
 
     }
     catch ( error ) 
@@ -67,13 +76,17 @@ const getAllFilteredGems = async ( req, res, next ) =>
     {
         cases[ "TC" ] = true;
     }
-    if ( type && !cutType )
+    else if ( type && !cutType )
     {
         cases[ "T" ] = true;
     }
-    if ( !type && cutType )
+    else if ( !type && cutType )
     {
         cases[ "C" ] = true;
+    }
+    else
+    {
+        return res.status( 400 ).json( { error: "Please provide at least one of cutType and type" } );
     }
 
     try 
@@ -228,17 +241,14 @@ const addToWishList = async ( req, res, next ) =>
 
 };
 
-const purchaseItems = async ( req, res, next ) =>
-{
 
-};
+
 
 export
 {
     addToCart,
     addToWishList,
     getAllGems,
-    purchaseItems,
     getAllFilteredGems,
     getOneGem,
     searchAllGems
