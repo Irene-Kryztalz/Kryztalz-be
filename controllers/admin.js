@@ -69,6 +69,7 @@ const postGem = async ( req, res, next ) =>
     }
     catch ( error ) 
     {
+        console.log( error );
         deleteFiles( paths );
         return catchErr( error, next );
     }
@@ -92,6 +93,7 @@ const postGem = async ( req, res, next ) =>
     }
     catch ( error ) 
     {
+        console.log( error );
         catchErr( error, next );
     }
 
