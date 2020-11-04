@@ -5,15 +5,16 @@ import User from "../models/user";
 import permissions from "../access/permissions";
 
 import { jwtSecret } from "../config";
-import { throwErr, catchErr, checkValidationErr } from "../utils";
+import { throwErr, catchErr, checkValidationErr, deleteFiles } from "../utils";
 
 const postGem = async ( req, res, next ) =>
 {
     const images = req.files;
 
-
     if ( images.length < 1 || images.length > 4 )
     {
+        const paths = images.map( i => i.path );
+        deleteFiles( paths );
         const error =
         {
             message: "Invalid Images.\nNumber of images must be at least 1 and less than 5",
@@ -26,6 +27,10 @@ const postGem = async ( req, res, next ) =>
 
     if ( errs )
     {
+        //remove uploaded file
+        //for some reason i cannot validate before file upload
+        const paths = images.map( i => i.path );
+        deleteFiles( paths );
         return catchErr( errs, next );
     }
 
@@ -64,8 +69,78 @@ const postGem = async ( req, res, next ) =>
 
 const editGem = async ( req, res, next ) =>
 {
+    const images = req.files;
 
-    res.json( { message: "edit" } );
+    if ( images.length > 4 )
+    {
+        const paths = images.map( i => i.path );
+        deleteFiles( paths );
+        const error =
+        {
+            message: "Invalid Images.\nNumber of images must be at less than 5",
+            data: []
+        };
+        return catchErr( error, next );
+    }
+
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        const paths = images.map( i => i.path );
+        deleteFiles( paths );
+        return catchErr( errs, next );
+    }
+
+    try 
+    {
+        let { type, name, cutType, price, description } = req.body;
+        let imageUrls;
+
+        if ( images.length > 0 )
+        {
+            imageUrls = images.map( img => 
+            {
+                if ( img.path.includes( "\\" ) )
+                {
+                    return img.path.replace( "\\", "/" );
+                }
+                return img.path;
+            } );
+        }
+
+        let gem = await Gem.findById( req.body.id );
+
+        if ( !gem )
+        {
+            const error =
+            {
+                message: "Unable to find gem with this id",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        gem.type = type.toLowerCase();
+        gem.name = name.toLowerCase();
+        gem.cutType = cutType.toLowerCase();
+        gem.price = price;
+        gem.description = description;
+        if ( imageUrls.length > 0 )
+        {
+            gem.imageUrls = imageUrls;
+        }
+
+        gem = await gem.save();
+
+        res.json( gem );
+
+    }
+    catch ( error )
+    {
+        catchErr( error, next );
+    }
+
 };
 
 const deleteGem = async ( req, res, next ) =>

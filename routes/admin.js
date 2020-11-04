@@ -33,9 +33,49 @@ router.post( "/signin",
     ], postSignIn );
 
 
+router.post( "/gems", checkAuth, checkPermissions( permissions.ADD_GEM ),
+    fileUpload, [
+    body( "name", "Please provide a valid string" )
+        .trim()
+        .notEmpty(),
+    body( "type", "Please provide a valid string for field `type`" )
+        .trim()
+        .notEmpty(),
+    body( "cutType", "Please provide a valid string for field `cutType`" )
+        .trim()
+        .notEmpty(),
+    body( "price", "Please provide a valid number for field `price`" )
+        .isNumeric(),
+    body( "description", "Please provide a valid string for field `description`" )
+        .trim()
+        .notEmpty(),
 
-router.post( "/gems", checkAuth, checkPermissions( permissions.ADD_GEM ), fileUpload, postGem );
-router.put( "/gems/:gemId", checkAuth, checkPermissions( permissions.EDIT_GEM ), fileUpload, editGem );
+], postGem );
+
+
+router.put( "/gems/:gemId",
+    checkAuth,
+    checkPermissions( permissions.EDIT_GEM ),
+    fileUpload,
+    [
+        body( "name", "Please provide a valid string" )
+            .trim()
+            .notEmpty(),
+        body( "type", "Please provide a valid string for field `type`" )
+            .trim()
+            .notEmpty(),
+        body( "cutType", "Please provide a valid string for field `cutType`" )
+            .trim()
+            .notEmpty(),
+        body( "price", "Please provide a valid number for field `price`" )
+            .isNumeric(),
+        body( "description", "Please provide a valid string for field `description`" )
+            .trim()
+            .notEmpty(),
+
+    ],
+    editGem );
+
 router.delete( "/gems/:gemId", checkAuth, checkPermissions( permissions.DELETE_GEM ), deleteGem );
 
 
