@@ -60,7 +60,6 @@ const checkValidationErr = ( req ) =>
     return null;
 };
 
-
 /**
  * Generate an string of random characters.
  * @param {number} len Token length.
@@ -82,23 +81,6 @@ const generateRandomToken = ( len ) =>
     return token;
 };
 
-const parseBool = value =>
-{
-    switch ( value )
-    {
-        case false:
-        case "false":
-        case "undefined":
-        case null:
-        case undefined:
-        case NaN:
-        case 0:
-            return false;
-
-        default:
-            return true;
-    }
-};
 
 const deleteFiles = ( imageArray ) =>
 {
@@ -134,6 +116,5 @@ export
     catchErr,
     throwErr,
     checkValidationErr,
-    parseBool,
     deleteFiles
 };

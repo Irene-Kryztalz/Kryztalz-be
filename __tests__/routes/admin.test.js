@@ -23,8 +23,7 @@ const gemConfig =
 {
     type: "emerald",
     name: "emarald",
-    isRough: true,
-    cutType: "",
+    cutType: "none",
     weight: 3,
     price: 12.88,
     description: "Description of gem",
@@ -67,7 +66,6 @@ describe( 'The POST gem process', () =>
 
         const token = jwt.sign(
             {
-                email: userA.email,
                 userId: userA._id.toString()
             }, jwtSecret );
 
@@ -80,6 +78,7 @@ describe( 'The POST gem process', () =>
             .field( "price", gemConfig.price )
             .field( "description", gemConfig.description )
             .attach( "photos", resolve( __dirname, gemConfig.file ) );
+
 
         expect( res.body.name ).toEqual( gemConfig.name );
         expect( res.body.imageUrls[ 0 ].endsWith( gemConfig.file ) ).toBe( true );

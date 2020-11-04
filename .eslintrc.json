@@ -9,5 +9,17 @@
         "sourceType": "module"
     },
     "rules": {
+    },
+    "globals": 
+    {
+        "jest":true,
+        "describe":true,
+        "beforeAll":true,
+        "afterEach":true,
+        "beforeEach":true,
+        "expect":true,
+        "it":true,
+        "test":true,
+        "__dirname":true
     }
 }

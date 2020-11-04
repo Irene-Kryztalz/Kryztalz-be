@@ -12,6 +12,11 @@ const orderSchema = new Schema(
                     {
                         type: Number,
                         required: true
+                    },
+                    price:
+                    {
+                        type: Types.Decimal128,
+                        required: true
                     }
                 }
 
@@ -36,5 +41,16 @@ const orderSchema = new Schema(
 
     }
 );
+
+orderSchema.set( 'toJSON',
+    {
+        transform: ( doc, ret ) =>
+        {
+            ret.price = +ret.price.toString();
+            ret.items.forEach( item => item.price = +item.price.toString() );
+            ret.__v = undefined;
+            return ret;
+        },
+    } );
 
 export default model( 'Order', orderSchema );
