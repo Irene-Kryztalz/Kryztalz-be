@@ -88,6 +88,8 @@ const deleteFiles = ( imageArray ) =>
     {
         const filePath = resolve( __dirname, file );
 
+        console.log( filePath );
+
         return new Promise( ( resolve, reject ) => 
         {
             try 
