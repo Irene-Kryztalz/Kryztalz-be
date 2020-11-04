@@ -34,6 +34,16 @@ export const gemSchema = new Schema( {
             }
 
         ],
+
+    imageIds:
+        [
+            {
+                _id: false,
+                type: String,
+                required: true,
+            }
+
+        ],
     description:
     {
         type: String,

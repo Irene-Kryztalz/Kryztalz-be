@@ -3,6 +3,11 @@ import { compare } from "bcrypt";
 import Gem from "../models/gem";
 import User from "../models/user";
 import permissions from "../access/permissions";
+import 
+{
+    cloudinaryUpload as uploadImages,
+    cloudinaryDelete as deleteImages
+} from "../middleware/fileUpload";
 
 import { jwtSecret } from "../config";
 import { throwErr, catchErr, checkValidationErr, deleteFiles } from "../utils";
@@ -10,10 +15,15 @@ import { throwErr, catchErr, checkValidationErr, deleteFiles } from "../utils";
 const postGem = async ( req, res, next ) =>
 {
     const images = req.files;
+    const imageUrls = [];
+    const imageIds = [];
+    const paths = images.map( i => i.path );
+
+    const uploader = async ( path ) => await uploadImages( path, 'Kryztalz' );
 
     if ( images.length < 1 || images.length > 4 )
     {
-        const paths = images.map( i => i.path );
+
         deleteFiles( paths );
         const error =
         {
@@ -29,31 +39,52 @@ const postGem = async ( req, res, next ) =>
     {
         //remove uploaded file
         //for some reason i cannot validate before file upload
-        const paths = images.map( i => i.path );
         deleteFiles( paths );
         return catchErr( errs, next );
     }
 
     try 
     {
-        let { type, name, cutType, price, description } = req.body;
-
-        const imageUrls = images.map( img => 
+        for ( const img of images )
         {
-            if ( img.path.includes( "\\" ) )
-            {
-                return img.path.replace( "\\", "/" );
-            }
-            return img.path;
-        } );
+            let { path } = img;
 
+            const newPath = await uploader( path );
+
+            if ( newPath.error )
+            {
+                const error =
+                {
+                    message: newPath.message,
+                    statusCode: newPath.http_code,
+                };
+
+                throwErr( error );
+            }
+
+            imageUrls.push( newPath.url );
+            imageIds.push( newPath.id );
+        }
+
+    }
+    catch ( error ) 
+    {
+        deleteFiles( paths );
+        return catchErr( error, next );
+    }
+
+    deleteFiles( paths );
+
+    try 
+    {
+        let { type, name, cutType, price, description } = req.body;
 
         const gem = await new Gem(
             {
                 type: type.toLowerCase(),
                 name: name.toLowerCase(),
                 cutType: cutType.toLowerCase(),
-                price, description, imageUrls
+                price, description, imageUrls, imageIds
             }
         ).save();
 
@@ -70,10 +101,11 @@ const postGem = async ( req, res, next ) =>
 const editGem = async ( req, res, next ) =>
 {
     const images = req.files;
+    const paths = images.map( i => i.path );
 
     if ( images.length > 4 )
     {
-        const paths = images.map( i => i.path );
+
         deleteFiles( paths );
         const error =
         {
@@ -87,7 +119,7 @@ const editGem = async ( req, res, next ) =>
 
     if ( errs )
     {
-        const paths = images.map( i => i.path );
+
         deleteFiles( paths );
         return catchErr( errs, next );
     }
@@ -145,12 +177,33 @@ const editGem = async ( req, res, next ) =>
 
 const deleteGem = async ( req, res, next ) =>
 {
-
+    const deleter = async ( id ) => await deleteImages( id, "image" );
     const { gemId } = req.params;
 
     try 
     {
-        await Gem.findByIdAndDelete( gemId );
+        const gem = await Gem.findById( gemId );
+
+        if ( !gem )
+        {
+            const error =
+            {
+                message: "Unable to find gem with this id",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        gem.imageIds.forEach( async id => 
+        {
+            const response = await deleter( id );
+            if ( response.error )
+            {
+                throwErr( response.error );
+            }
+        } );
+
+        await Gem.deleteOne( { _id: gemId } );
 
         res.json( { message: `Gem ${ gemId } successfully deleted` } );
     }
@@ -313,7 +366,7 @@ const getOverview = async ( req, res, next ) =>
     }
     catch ( error )
     {
-
+        catchErr( error, next );
     }
 
 };

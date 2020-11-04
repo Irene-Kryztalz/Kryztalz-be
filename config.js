@@ -12,7 +12,10 @@ const port = process.env.PORT || 7272,
     email_trouble_template = process.env.EMAIL_TROUBLE_TEMPLATE,
     email_confirm_template = process.env.EMAIL_C0NFIRM_TEMPLATE,
     admin_origin = process.env.ALLOWED_ORIGIN_ADMIN,
-    origin = process.env.ALLOWED_ORIGIN;
+    origin = process.env.ALLOWED_ORIGIN,
+    cloudinary_name = process.env.CLOUDINARY_NAME,
+    cloudinary_key = process.env.CLOUDINARY_API_KEY,
+    cloudinary_secret = process.env.CLOUDINARY_SECRET;
 
 export
 {
@@ -25,5 +28,8 @@ export
     sgKey,
     dbUrl,
     sender,
-    dbUrlTest
+    dbUrlTest,
+    cloudinary_key,
+    cloudinary_name,
+    cloudinary_secret
 };
