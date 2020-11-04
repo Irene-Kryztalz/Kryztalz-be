@@ -50,6 +50,7 @@ const fileFilter = ( req, file, cb ) =>
 
 const cloudinaryUpload = ( file, folder ) =>
 {
+
     return new Promise( ( resolve, reject ) =>
     {
         cloudinary.v2.uploader.upload( file,
@@ -61,6 +62,7 @@ const cloudinaryUpload = ( file, folder ) =>
 
             if ( error )
             {
+                console.log( 7 );
                 reject( { ...error } );
             }
             else
