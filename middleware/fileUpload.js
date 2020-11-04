@@ -1,5 +1,20 @@
 import multer from "multer";
 import { nanoid } from 'nanoid';
+import cloudinary from "cloudinary";
+
+import 
+{
+    cloudinary_secret,
+    cloudinary_key,
+    cloudinary_name
+} from "../config";
+
+
+cloudinary.config( {
+    cloud_name: cloudinary_name,
+    api_key: cloudinary_key,
+    api_secret: cloudinary_secret
+} );
 
 const fileStorage = multer.diskStorage(
     {
@@ -32,6 +47,59 @@ const fileFilter = ( req, file, cb ) =>
 
 };
 
+
+const cloudinaryUpload = ( file, folder ) =>
+{
+    return new Promise( ( resolve, reject ) =>
+    {
+        cloudinary.v2.uploader.upload( file,
+            {
+                resource_type: "auto",
+                folder: folder
+            }, ( error, result ) =>
+        {
+
+            if ( error )
+            {
+                reject( { ...error } );
+            }
+            else
+            {
+
+                resolve( {
+                    url: result.secure_url,
+                    id: result.public_id
+                } );
+            }
+
+
+
+        } );
+    } );
+};
+
+const cloudinaryDelete = ( id, type ) =>
+{
+    return new Promise( ( resolve, reject ) =>
+    {
+        cloudinary.v2.uploader.destroy( id,
+            {
+                resource_type: type
+            }, ( error, result ) =>
+        {
+            if ( error )
+            {
+                reject( { error: { ...error } } );
+            }
+            else
+            {
+                resolve( result );
+            }
+        } );
+    } );
+};
+
 const upload = multer( { fileFilter, storage: fileStorage } ).array( 'photos', 4 );
 
 export default upload;
+export { cloudinaryUpload, cloudinaryDelete };
