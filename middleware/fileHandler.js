@@ -9,7 +9,6 @@ import
     cloudinary_name
 } from "../config";
 
-
 cloudinary.config( {
     cloud_name: cloudinary_name,
     api_key: cloudinary_key,
@@ -29,7 +28,6 @@ const fileStorage = multer.diskStorage(
         },
     } );
 
-
 const fileFilter = ( req, file, cb ) =>
 {
     if ( file.mimetype === "image/jpeg" ||
@@ -47,16 +45,17 @@ const fileFilter = ( req, file, cb ) =>
 
 };
 
-
 const cloudinaryUpload = ( file, folder ) =>
 {
-
     return new Promise( ( resolve, reject ) =>
     {
         cloudinary.v2.uploader.upload( file,
             {
                 resource_type: "auto",
-                folder: folder
+                folder: folder,
+                width: 400,
+                height: 400,
+                crop: "limit"
             }, ( error, result ) =>
         {
 
@@ -73,8 +72,6 @@ const cloudinaryUpload = ( file, folder ) =>
                     id: result.public_id
                 } );
             }
-
-
 
         } );
     } );

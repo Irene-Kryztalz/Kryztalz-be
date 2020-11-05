@@ -7,7 +7,7 @@ import
 {
     cloudinaryUpload as uploadImages,
     cloudinaryDelete as deleteImages
-} from "../middleware/fileUpload";
+} from "../middleware/fileHandler";
 
 import { jwtSecret } from "../config";
 import { throwErr, catchErr, checkValidationErr, deleteFiles } from "../utils";
@@ -69,7 +69,7 @@ const postGem = async ( req, res, next ) =>
     }
     catch ( error ) 
     {
-        console.log( error );
+
         deleteFiles( paths );
         return catchErr( error, next );
     }
@@ -93,7 +93,7 @@ const postGem = async ( req, res, next ) =>
     }
     catch ( error ) 
     {
-        console.log( error );
+
         catchErr( error, next );
     }
 
