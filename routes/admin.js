@@ -15,7 +15,7 @@ import
 import permissions from "../access/permissions";
 import checkAuth from "../middleware/checkAuth";
 import checkPermissions from "../middleware/checkPermissions";
-import fileUpload from "../middleware/fileUpload";
+import fileUpload from "../middleware/fileHandler";
 
 const router = Router();
 
