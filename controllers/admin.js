@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { compare } from "bcrypt";
 import Gem from "../models/gem";
 import User from "../models/user";
+import Order from "../models/order";
 import permissions from "../access/permissions";
 import 
 {
@@ -359,12 +360,21 @@ const getOverview = async ( req, res, next ) =>
     //total number of gems
     //num of admin that can add gems
     //gem distributions by existence
-    //gem distributions by sales/orders
+    //gem distributions by cutype
     //
 
     try 
     {
-        res.json();
+        const count = await Gem.estimatedDocumentCount();
+
+        const gemDistByType = await Gem.aggregate().
+            group( { _id: '$type', count: { $sum: 1 } } );
+
+        const gemDistByCut = await Gem.aggregate().
+            group( { _id: '$cutType', count: { $sum: 1 } } );
+
+
+        res.json( { count, gemDistByCut, gemDistByType } );
     }
     catch ( error )
     {
