@@ -1,27 +1,36 @@
 import { model, Schema, Types } from "mongoose";
-import { gemSchema } from "./gem";
+
+const itemSchema = new Schema(
+    {
+        _id: false,
+        quantity:
+        {
+            type: Number,
+            required: true
+        },
+        price:
+        {
+            type: Types.Decimal128,
+            required: true
+        },
+        cutType:
+        {
+            type: String,
+            required: true
+        },
+        type:
+        {
+            type: String,
+            required: true
+        },
+    }
+);
+
 
 const orderSchema = new Schema(
     {
-        items:
-            [
-                {
-                    _id: false,
-                    gem: gemSchema,
-                    quantity:
-                    {
-                        type: Number,
-                        required: true
-                    },
-                    price:
-                    {
-                        type: Types.Decimal128,
-                        required: true
-                    }
-                }
-
-            ],
-        price:
+        items: [ itemSchema ],
+        total:
         {
             type: Types.Decimal128,
             required: true
