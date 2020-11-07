@@ -49,6 +49,7 @@ const generatePDF = async order =>
     await browser.close();
 
     return [ buffer, html ];
+
 };
 
 
