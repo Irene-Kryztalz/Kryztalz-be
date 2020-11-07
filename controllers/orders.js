@@ -13,7 +13,7 @@ const ITEM_PER_PAGE = 10;
 const generatePDF = async order => 
 {
 
-    const templateHtml = fs.readFileSync( path.join( process.cwd(), 'templates/invoice.html' ), 'utf8' );
+    const templateHtml = fs.readFileSync( path.join( __dirname, '../templates/invoice.html' ), 'utf8' );
     const template = handlebars.compile( templateHtml );
     const html = template( order );
 
