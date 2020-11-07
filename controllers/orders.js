@@ -32,7 +32,10 @@ const generatePDF = async order =>
     };
 
     const browser = await puppeteer.launch( {
-        args: [ '--no-sandbox' ],
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+        ],
         headless: true
     } );
 
