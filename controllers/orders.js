@@ -115,7 +115,7 @@ const createOrder = async ( req, res, next ) =>
         items: gems,
         userCurrency,
         discount,
-        deliveryAdress,
+        deliveryAddress,
         description,
         rateToCurr
     } = req.body;
@@ -127,9 +127,9 @@ const createOrder = async ( req, res, next ) =>
         return catchErr( errs, next );
     }
 
-    if ( !deliveryAdress || !deliveryAdress.length === 0 )
+    if ( !deliveryAddress || !deliveryAddress.length === 0 )
     {
-        deliveryAdress = [ "No address available" ];
+        deliveryAddress = [ "No address available" ];
     }
 
     const ids = gems.map( g => g._id );
@@ -226,7 +226,7 @@ const createOrder = async ( req, res, next ) =>
                 discount,
                 amountDue,
                 userCurrency,
-                deliveryAdress,
+                deliveryAddress,
                 rateToCurr,
                 description,
                 orderedAt: new Date().toISOString(),
