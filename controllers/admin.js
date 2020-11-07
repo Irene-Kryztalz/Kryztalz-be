@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { compare } from "bcrypt";
 import Gem from "../models/gem";
 import User from "../models/user";
+import Order from "../models/order";
 import permissions from "../access/permissions";
 import 
 {
@@ -288,7 +289,8 @@ const getUser = async ( req, res, next ) =>
 
         res.status( 200 ).json( user );
 
-    } catch ( error ) 
+    }
+    catch ( error ) 
     {
         catchErr( error, next );
     }
@@ -356,15 +358,91 @@ const postSignIn = async ( req, res, next ) =>
 
 const getOverview = async ( req, res, next ) =>
 {
-    //total number of gems
-    //num of admin that can add gems
-    //gem distributions by existence
-    //gem distributions by sales/orders
-    //
-
     try 
     {
-        res.json();
+        const gemCount = await Gem.estimatedDocumentCount();
+
+        const gemDistByType = await Gem.aggregate().
+            group( { _id: '$type', count: { $sum: 1 } } );
+
+        const gemDistByCut = await Gem.aggregate().
+            group( { _id: '$cutType', count: { $sum: 1 } } );
+
+        const ordersByType = await Order.aggregate(
+            [
+                { $project: { "items": 1 } },
+                { $unwind: '$items' },
+                {
+                    $group:
+                    {
+                        _id:
+                        {
+                            _id: "$_id",
+                            type: "$items.type",
+                            quantity: "$items.quantity"
+                        }
+                    }
+                },
+                {
+                    $group:
+                    {
+                        _id: "$_id.type",
+                        count: { $sum: "$_id.quantity" }
+                    }
+
+                },
+                {
+                    $addFields:
+                    {
+                        count: { $toDouble: "$count" }
+                    }
+                }
+
+            ] );
+
+        const ordersByCut = await Order.aggregate(
+            [
+                { $project: { "items": 1 } },
+                { $unwind: '$items' },
+                {
+                    $group:
+                    {
+                        _id:
+                        {
+                            _id: "$_id",
+                            cutType: "$items.cutType",
+                            quantity: "$items.quantity"
+                        }
+                    }
+                },
+                {
+                    $group:
+                    {
+                        _id: "$_id.cutType",
+                        count: { $sum: "$_id.quantity" }
+                    }
+
+                },
+                {
+                    $addFields:
+                    {
+                        count: { $toDouble: "$count" }
+                    }
+                }
+
+            ] );
+
+
+        res.json(
+            {
+                gemCount,
+                gemDistByType,
+                gemDistByCut,
+                ordersByType,
+                ordersByCut
+            } );
+
+
     }
     catch ( error )
     {

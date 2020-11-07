@@ -129,21 +129,17 @@ const postSignUp = async ( req, res, next ) =>
 
         //send mail
 
-
-        /*
-            sendMail(
+        sendMail(
+            {
+                to: user.email,
+                template: email_confirm_template,
+                data:
                 {
-                    to: user.email,
-                    template: email_confirm_template,
-                    data:
-                    {
-                        name: user.name,
-                        url
-                    }
+                    name: user.name,
+                    url
                 }
-            );
-         */
-
+            }
+        );
 
     } catch ( error ) 
     {

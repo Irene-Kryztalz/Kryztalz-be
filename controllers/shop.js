@@ -43,6 +43,7 @@ const getAllGems = async ( req, res, next ) =>
 const getOneGem = async ( req, res, next ) =>
 {
     const { gemId } = req.params;
+
     try 
     {
         const gem = await Gem.findById( gemId );
@@ -240,9 +241,6 @@ const addToWishList = async ( req, res, next ) =>
 {
 
 };
-
-
-
 
 export
 {

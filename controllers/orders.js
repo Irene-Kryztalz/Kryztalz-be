@@ -1,38 +1,306 @@
+import fs from 'fs';
+import path from 'path';
+import handlebars from "handlebars";
+import puppeteer from "puppeteer";
 import Order from "../models/order";
-import { throwErr, catchErr } from "../utils";
+
+import Gem from "../models/gem";
+
+import { throwErr, catchErr, checkValidationErr } from "../utils";
 
 const ITEM_PER_PAGE = 10;
 
-const purchaseItems = async ( req, res, next ) =>
+const generatePDF = async order => 
 {
 
+    const templateHtml = fs.readFileSync( path.join( process.cwd(), 'templates/invoice.html' ), 'utf8' );
+    const template = handlebars.compile( templateHtml );
+    const html = template( order );
+
+    const options =
+    {
+        format: 'A4',
+        printBackground: true,
+        margin:
+        {
+            left: '0px',
+            top: '0px',
+            right: '0px',
+            bottom: '0px',
+
+        }
+    };
+
+    const browser = await puppeteer.launch( {
+        args: [ '--no-sandbox' ],
+        headless: true
+    } );
+
+    const page = await browser.newPage();
+
+    await page.goto( `data:text/html;charset=UTF-8,${ html }`, {
+        waitUntil: 'networkidle0'
+    } );
+
+    const buffer = await page.pdf( options );
+    await browser.close();
+
+    return [ buffer, html ];
 };
+
 
 const getOneOrder = async ( req, res, next ) =>
 {
+    const { orderId } = req.params;
 
+    try 
+    {
+        const order = await Order.findById( orderId );
+
+        if ( !order )
+        {
+            const error =
+            {
+                message: "Unable to find order",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        res.status( 200 ).json( order );
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
 };
 
 const getOrders = async ( req, res, next ) =>
 {
+    const { lastId } = req.query;
 
+    try 
+    {
+        let orders;
+
+        if ( lastId )
+        {
+            orders = await Order.find(
+                { _id: { "$lt": lastId }, userId: req.userId } ).sort( { _id: "desc" } ).limit( ITEM_PER_PAGE );
+        }
+        else
+        {
+            orders = await Order.find( { userId: req.userId } ).sort( { _id: "desc" } ).limit( ITEM_PER_PAGE );
+        }
+
+        res.json( orders );
+    }
+    catch ( error ) 
+    {
+        if ( error.message.includes( "Cast to ObjectId failed " ) )
+        {
+            error.message = "Invalid value provided for lastId.";
+        }
+        catchErr( error, next );
+    }
 };
 
 const createOrder = async ( req, res, next ) =>
 {
+    let {
+        items: gems,
+        userCurrency,
+        discount,
+        deliveryAdress,
+        description,
+        rateToCurr
+    } = req.body;
+
+    const errs = checkValidationErr( req );
+
+    if ( errs )
+    {
+        return catchErr( errs, next );
+    }
+
+    if ( !deliveryAdress || !deliveryAdress.length === 0 )
+    {
+        deliveryAdress = [ "No address available" ];
+    }
+
+    const ids = gems.map( g => g._id );
+    const items = [];
+
+    try 
+    {
+        const gemList = await Gem.find().where( '_id' ).in( ids ).exec();
+
+        if ( gemList.length < 1 )
+        {
+            const error =
+            {
+                message: "Invalid Ids provided for gems",
+                statusCode: 400
+            };
+            throwErr( error );
+        }
+        else if ( gemList.length !== gems.length )
+        {
+            const missingGems = gems.filter( g =>
+            {
+                const gem = gemList.find( gem => gem._id == g._id );
+
+                if ( !gem )
+                {
+                    return true;
+                }
+
+                return false;
+
+            } ).map( g => g._id );
+            const error =
+            {
+                message: `Unable to proceed with order. The following gems with ids [${ missingGems }] do not exist anynore`,
+                statusCode: 400
+            };
+            throwErr( error );
+        }
+
+        let total = 0;
+
+        gemList.forEach( ( g ) => 
+        {
+            const gem = gems.find( gem => gem._id == g._id );
+
+            if ( !gem.quantity )
+            {
+                const error =
+                {
+                    message: "Please provide quantity for gem",
+                    statusCode: 400
+                };
+                throwErr( error );
+            }
+
+            const item =
+            {
+                quantity: +gem.quantity,
+                price: +g.price,
+                cutType: g.cutType,
+                type: g.type,
+                name: g.name
+            };
+
+            total = total + ( +g.price * +gem.quantity );
+
+            items.push( item );
+        } );
+
+
+        if ( userCurrency === "₦" )
+        {
+            rateToCurr = 1;
+        }
+
+        let amountDue = total;
+
+        if ( discount )
+        {
+            if ( discount > total )
+            {
+                discount = total;
+            }
+
+            amountDue = total - discount;
+        }
+
+
+        const order = await new Order(
+            {
+                items,
+                total,
+                discount,
+                amountDue,
+                userCurrency,
+                deliveryAdress,
+                rateToCurr,
+                description,
+                orderedAt: new Date().toISOString(),
+                userId: req.userId
+            }
+        ).save();
+
+        res.status( 201 ).json( order );
+    }
+    catch ( error ) 
+    {
+        if ( error.message.includes( "http" ) )
+        {
+            error.message = "Unable to validate order";
+        }
+        catchErr( error, next );
+    }
+
+
 
 };
 
 const generateOrderInvoice = async ( req, res, next ) =>
 {
+    const { orderId } = req.params;
 
     try 
     {
-        res.json();
-    }
-    catch ( error )
-    {
+        let order = await Order.findById( orderId )
+            .populate( "userId", "name email" )
+            .exec();
 
+        if ( !order )
+        {
+            const error =
+            {
+                message: "Unable to find order",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        order = JSON.parse( JSON.stringify( order ) );
+
+        order.orderedAt = new Date( order.orderedAt ).toLocaleDateString( 'en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        } );
+        order.total = +order.total.toFixed( 2 );
+        order.discount = +order.discount.toFixed( 2 );
+        order.amountDue = +order.amountDue.toFixed( 2 );
+
+        handlebars.registerHelper( "multiply", function ( ...args )
+        {
+
+            let prod = 1;
+            args.forEach( i => 
+            {
+                if ( +i )
+                {
+                    prod *= i;
+                }
+
+            } );
+
+
+            return prod.toFixed( 2 );
+        } );
+
+
+        const [ buffer, html ] = await generatePDF( order );
+        res.send( html );
+        // res.end( buffer );
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
     }
 
 };
@@ -42,6 +310,5 @@ export
     getOrders,
     createOrder,
     getOneOrder,
-    purchaseItems,
     generateOrderInvoice,
 };

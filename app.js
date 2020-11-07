@@ -8,6 +8,7 @@ import { origin, admin_origin } from "./config";
 import userRoutes from "./routes/user";
 import shopRoutes from "./routes/shop";
 import adminRoutes from "./routes/admin";
+import ordersRoutes from "./routes/orders";
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.get( "/favicon.ico", ( req, res ) =>
 app.use( "/user", userRoutes );
 app.use( "/shop", shopRoutes );
 app.use( "/admin", adminRoutes );
+app.use( "/orders", ordersRoutes );
 
 app.get( [ "/", '/test' ], async ( req, res ) =>
 {
