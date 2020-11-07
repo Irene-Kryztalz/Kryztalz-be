@@ -2,9 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import handlebars from "handlebars";
 import puppeteer from "puppeteer";
-
 import Order from "../models/order";
-import User from "../models/user";
+
 import Gem from "../models/gem";
 
 import { throwErr, catchErr, checkValidationErr } from "../utils";
