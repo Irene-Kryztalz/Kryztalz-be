@@ -3,7 +3,7 @@ import path from 'path';
 import handlebars from "handlebars";
 import puppeteer from "puppeteer";
 import Order from "../models/order";
-
+import User from "../models/user";
 import Gem from "../models/gem";
 
 import { throwErr, catchErr, checkValidationErr } from "../utils";
@@ -234,6 +234,11 @@ const createOrder = async ( req, res, next ) =>
             }
         ).save();
 
+        const user = await User.findById( req.userId, "cart" );
+        user.cart = [];
+
+        await user.save();
+
         res.status( 201 ).json( order );
     }
     catch ( error ) 
@@ -276,9 +281,10 @@ const generateOrderInvoice = async ( req, res, next ) =>
             month: 'long',
             year: 'numeric'
         } );
-        order.total = +order.total.toFixed( 2 );
-        order.discount = +order.discount.toFixed( 2 );
-        order.amountDue = +order.amountDue.toFixed( 2 );
+
+        order.total = order.total.toFixed( 2 );
+        order.discount = order.discount.toFixed( 2 );
+        order.amountDue = order.amountDue.toFixed( 2 );
 
         handlebars.registerHelper( "multiply", function ( ...args )
         {
@@ -297,10 +303,9 @@ const generateOrderInvoice = async ( req, res, next ) =>
             return prod.toFixed( 2 );
         } );
 
-
-        const [ buffer, html ] = await generatePDF( order );
-        res.send( html );
-        // res.end( buffer );
+        const [ buffer, /*html*/ ] = await generatePDF( order );
+        //res.send( html );
+        res.end( buffer );
     }
     catch ( error ) 
     {

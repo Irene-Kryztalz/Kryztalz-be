@@ -234,12 +234,113 @@ const searchAllGems = async ( req, res, next ) =>
 
 const addToCart = async ( req, res, next ) =>
 {
+    const { productId, quantity } = req.body;
 
+    try 
+    {
+        const user = User.findById( req.userId, "cart" );
+
+        const gem = Gem.findById( productId );
+
+        if ( !gem )
+        {
+            const error =
+            {
+                message: "Unable to find gem",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        user.cart = [ ...user.cart, { _id: productId, quantity } ];
+
+        await user.save();
+
+        res.json( user );
+
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
 };
 
 const addToWishList = async ( req, res, next ) =>
 {
+    const { productId } = req.body;
 
+    try 
+    {
+        const user = User.findById( req.userId, "wishlist" );
+        const gem = Gem.findById( productId );
+
+        if ( !gem )
+        {
+            const error =
+            {
+                message: "Unable to find gem",
+                statusCode: 404
+            };
+            throwErr( error );
+        }
+
+        user.wishlist = [ ...user.wishlist, { _id: productId } ];
+
+        await user.save();
+
+        res.json( user );
+
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+};
+
+
+const removeFromCart = async ( req, res, next ) =>
+{
+    const { productId } = req.body;
+
+    try 
+    {
+        const user = User.findById( req.userId, "cart" );
+
+        user.cart = [ ...user.cart ].filter( item => item._id.toString() !== productId );
+
+        await user.save();
+
+        res.json( user );
+
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
+};
+
+const removeFromWishList = async ( req, res, next ) =>
+{
+    const { productId } = req.body;
+
+    try 
+    {
+        const user = User.findById( req.userId, "wishlist" );
+
+        user.wishlist = [ ...user.wishlist ].filter( item => item._id.toString() !== productId );
+
+        await user.save();
+
+        res.json( user );
+
+    }
+    catch ( error ) 
+    {
+        catchErr( error, next );
+    }
 };
 
 export
@@ -249,5 +350,7 @@ export
     getAllGems,
     getAllFilteredGems,
     getOneGem,
-    searchAllGems
+    searchAllGems,
+    removeFromCart,
+    removeFromWishList
 };
