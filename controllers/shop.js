@@ -2,7 +2,7 @@ import Gem from "../models/gem";
 import User from "../models/user";
 import { throwErr, catchErr } from "../utils";
 
-const ITEM_PER_PAGE = 10;
+const ITEM_PER_PAGE = 2;
 
 const getAllGems = async ( req, res, next ) =>
 {
@@ -21,11 +21,11 @@ const getAllGems = async ( req, res, next ) =>
 
         if ( lastId )
         {
-            gems = await Gem.find( { _id: { "$gt": lastId } } ).limit( ITEM_PER_PAGE );
+            gems = await Gem.find( { _id: { "$gt": lastId } }, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
         }
         else
         {
-            gems = await Gem.find().limit( ITEM_PER_PAGE );
+            gems = await Gem.find( {}, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
         }
 
         res.json( { count, gems } );

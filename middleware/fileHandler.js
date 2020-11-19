@@ -88,7 +88,7 @@ const cloudinaryDelete = ( id, type ) =>
         {
             if ( error )
             {
-                reject( { error: { ...error } } );
+                reject( { message: "Unable to delete image( s ) from cloudinary" } );
             }
             else
             {

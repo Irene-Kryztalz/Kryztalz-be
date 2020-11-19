@@ -197,14 +197,12 @@ const deleteGem = async ( req, res, next ) =>
             throwErr( error );
         }
 
-        gem.imageIds.forEach( async id => 
+        for ( let index = 0; index < gem.imageIds.length; index++ ) 
         {
-            const response = await deleter( id );
-            if ( response.error )
-            {
-                throwErr( response.error );
-            }
-        } );
+            const id = gem.imageIds[ index ];
+            await deleter( id );
+
+        }
 
         await Gem.deleteOne( { _id: gemId } );
 
@@ -212,6 +210,7 @@ const deleteGem = async ( req, res, next ) =>
     }
     catch ( error ) 
     {
+        console.log( error );
         catchErr( error, next );
     }
 
@@ -343,6 +342,7 @@ const postSignIn = async ( req, res, next ) =>
             {
                 token,
                 email,
+                name: user.name,
                 role: user.roleId,
                 expires: ( fourH + new Date().getTime() )
             }
