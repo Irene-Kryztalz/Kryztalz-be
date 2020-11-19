@@ -210,7 +210,6 @@ const deleteGem = async ( req, res, next ) =>
     }
     catch ( error ) 
     {
-        console.log( error );
         catchErr( error, next );
     }
 
