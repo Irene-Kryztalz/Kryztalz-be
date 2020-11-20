@@ -30,12 +30,14 @@ const fileStorage = multer.diskStorage(
 
 const fileFilter = ( req, file, cb ) =>
 {
+
     if ( file.mimetype === "image/jpeg" ||
         file.mimetype === "image/jpg" ||
         file.mimetype === "image/png" ||
         file.mimetype === "image/webp" ||
         file.mimetype === "image/svg+xml" )
     {
+
         cb( null, true );
     }
     else
@@ -62,7 +64,10 @@ const cloudinaryUpload = ( file, folder ) =>
             if ( error )
             {
 
-                reject( { ...error } );
+                if ( error )
+                {
+                    reject( { message: "Unable to upload image( s ) to cloudinary" } );
+                }
             }
             else
             {
@@ -88,7 +93,7 @@ const cloudinaryDelete = ( id, type ) =>
         {
             if ( error )
             {
-                reject( { error: { ...error } } );
+                reject( { message: "Unable to delete image( s ) from cloudinary" } );
             }
             else
             {

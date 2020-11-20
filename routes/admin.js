@@ -32,7 +32,6 @@ router.post( "/signin",
             .notEmpty()
     ], postSignIn );
 
-
 router.post( "/gems", checkAuth, checkPermissions( permissions.ADD_GEM ),
     fileUpload, [
     body( "name", "Please provide a valid string" )
@@ -51,7 +50,6 @@ router.post( "/gems", checkAuth, checkPermissions( permissions.ADD_GEM ),
         .notEmpty(),
 
 ], postGem );
-
 
 router.put( "/gems/:gemId",
     checkAuth,
@@ -75,9 +73,7 @@ router.put( "/gems/:gemId",
 
     ],
     editGem );
-
 router.delete( "/gems/:gemId", checkAuth, checkPermissions( permissions.DELETE_GEM ), deleteGem );
-
 
 router.post( "/user", checkAuth,
     [
@@ -91,8 +87,6 @@ router.put( "/add-permission", checkAuth, checkPermissions( permissions.EDIT_USE
 router.put( "/remove-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), removeUserPermission );
 router.get( "/permissions", checkAuth, getPermissions );
 
-
 router.get( "/overview", checkAuth, getOverview );
-
 
 export default router;

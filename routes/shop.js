@@ -8,14 +8,19 @@ import
     getAllGems,
     getAllFilteredGems,
     getOneGem,
-    searchAllGems
+    searchAllGems,
+    removeFromWishList,
+    removeFromCart
 }
     from "../controllers/shop";
 
 const router = Router();
 
-router.post( "/cart", checkAuth, addToCart );
-router.post( "/wishlist", checkAuth, addToWishList );
+router.post( "/add-cart", checkAuth, addToCart );
+router.post( "/add-wishlist", checkAuth, addToWishList );
+
+router.post( "/remove-cart", checkAuth, removeFromCart );
+router.post( "/remove-wishlist", checkAuth, removeFromWishList );
 
 router.get( "/search", searchAllGems );
 router.get( "/gems/filter", getAllFilteredGems );

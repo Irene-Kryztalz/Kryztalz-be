@@ -125,7 +125,7 @@ const postSignUp = async ( req, res, next ) =>
 
         const url = `${ req.headers.origin }/verify-account?id=${ user._id }&emailToken=${ user.emailToken }`;
 
-        console.log( url );
+        //   console.log( url );
 
         //send mail
 
