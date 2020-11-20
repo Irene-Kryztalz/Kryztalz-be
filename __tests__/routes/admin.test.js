@@ -12,6 +12,8 @@ import app from "../../app";
 import User from "../../models/user";
 import roles from "../../access/roles";
 
+jest.mock( "@sendgrid/mail" );
+
 const request = supertest( app );
 setUpDB( "admin-endpoint" );
 

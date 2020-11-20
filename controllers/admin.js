@@ -52,17 +52,6 @@ const postGem = async ( req, res, next ) =>
 
             const newPath = await uploader( path );
 
-            if ( newPath.error )
-            {
-                const error =
-                {
-                    message: newPath.message,
-                    statusCode: newPath.http_code,
-                };
-
-                throwErr( error );
-            }
-
             imageUrls.push( newPath.url );
             imageIds.push( newPath.id );
         }
@@ -90,6 +79,8 @@ const postGem = async ( req, res, next ) =>
             }
         ).save();
 
+
+
         res.status( 201 ).json( gem );
     }
     catch ( error ) 
@@ -103,8 +94,11 @@ const postGem = async ( req, res, next ) =>
 
 const editGem = async ( req, res, next ) =>
 {
-    const images = req.files;
+    const images = req.files || [];
     const paths = images.map( i => i.path );
+
+    const uploader = async ( path ) => await uploadImages( path, 'Kryztalz' );
+
 
     if ( images.length > 4 )
     {
@@ -127,24 +121,31 @@ const editGem = async ( req, res, next ) =>
         return catchErr( errs, next );
     }
 
+
     try 
     {
         let { type, name, cutType, price, description } = req.body;
-        let imageUrls;
+        let imageUrls = [];
+        let imageIds = [];
 
         if ( images.length > 0 )
         {
-            imageUrls = images.map( img => 
+
+            for ( const img of images )
             {
-                if ( img.path.includes( "\\" ) )
-                {
-                    return img.path.replace( "\\", "/" );
-                }
-                return img.path;
-            } );
+                let { path } = img;
+
+                const newPath = await uploader( path );
+
+                imageUrls.push( newPath.url );
+                imageIds.push( newPath.id );
+            }
+
+            deleteFiles( paths );
         }
 
-        let gem = await Gem.findById( req.body.id );
+        let gem = await Gem.findById( req.params.gemId );
+
 
         if ( !gem )
         {
@@ -161,8 +162,11 @@ const editGem = async ( req, res, next ) =>
         gem.cutType = cutType.toLowerCase();
         gem.price = price;
         gem.description = description;
+
         if ( imageUrls.length > 0 )
         {
+
+            gem.imageIds = imageIds;
             gem.imageUrls = imageUrls;
         }
 
@@ -173,8 +177,11 @@ const editGem = async ( req, res, next ) =>
     }
     catch ( error )
     {
+        deleteFiles( paths );
         catchErr( error, next );
     }
+
+
 
 };
 
