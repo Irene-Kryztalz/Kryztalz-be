@@ -106,7 +106,7 @@ const getAllFilteredGems = async ( req, res, next ) =>
                         type,
                         cutType
                     };
-                    gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+                    gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
                     break;
 
                 case cases.T:
@@ -115,7 +115,7 @@ const getAllFilteredGems = async ( req, res, next ) =>
                         _id: { "$gt": lastId },
                         type
                     };
-                    gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+                    gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
                     break;
 
                 case cases.C:
@@ -124,7 +124,7 @@ const getAllFilteredGems = async ( req, res, next ) =>
                         _id: { "$gt": lastId },
                         cutType
                     };
-                    gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+                    gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
                     break;
 
                 default:
@@ -137,18 +137,18 @@ const getAllFilteredGems = async ( req, res, next ) =>
             {
                 case cases.TC:
                     filter = { type, cutType };
-                    gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+                    gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
                     break;
 
                 case cases.T:
                     filter = { type };
-                    gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+                    gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
                     break;
 
 
                 case cases.C:
                     filter = { cutType };
-                    gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+                    gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
                     break;
 
 
@@ -186,6 +186,7 @@ const searchAllGems = async ( req, res, next ) =>
     try 
     {
         let filter = {};
+        let count = null;
 
         if ( lastId )
         {
@@ -195,11 +196,13 @@ const searchAllGems = async ( req, res, next ) =>
         filter = { ...filter, $text: { $search: searchString } };
 
         let gems = await Gem.find(
-            filter,
+            filter, "name price imageUrls type",
             { score: { $meta: "textScore" } },
         ).sort(
             { score: { $meta: 'textScore' } }
         ).limit( ITEM_PER_PAGE );
+
+        count = await Gem.countDocuments( filter );
 
         //enable partial search
         if ( gems.length === 0 )
@@ -219,10 +222,12 @@ const searchAllGems = async ( req, res, next ) =>
                         { cutType: regex }
                     ]
             };
-            gems = await Gem.find( filter ).limit( ITEM_PER_PAGE );
+            gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
+            count = await Gem.countDocuments( filter );
         }
 
-        res.json( gems );
+
+        return res.json( { gems, count } );
     }
     catch ( error ) 
     {
