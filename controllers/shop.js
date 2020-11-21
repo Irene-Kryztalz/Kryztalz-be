@@ -2,7 +2,7 @@ import Gem from "../models/gem";
 import User from "../models/user";
 import { throwErr, catchErr } from "../utils";
 
-const ITEM_PER_PAGE = 2;
+const ITEM_PER_PAGE = 10;
 
 const getAllGems = async ( req, res, next ) =>
 {
