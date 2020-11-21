@@ -197,7 +197,10 @@ const searchAllGems = async ( req, res, next ) =>
 
         let gems = await Gem.find(
             filter, "name price imageUrls type",
-            { score: { $meta: "textScore" } },
+            {
+                score: { $meta: "textScore" },
+                projection: { score: { $meta: 'textScore' } }
+            },
         ).sort(
             { score: { $meta: 'textScore' } }
         ).limit( ITEM_PER_PAGE );
