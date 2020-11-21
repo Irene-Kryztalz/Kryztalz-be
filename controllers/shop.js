@@ -2,7 +2,7 @@ import Gem from "../models/gem";
 import User from "../models/user";
 import { throwErr, catchErr } from "../utils";
 
-const ITEM_PER_PAGE = 10;
+const ITEM_PER_PAGE = 2;
 
 const getAllGems = async ( req, res, next ) =>
 {
@@ -205,7 +205,7 @@ const searchAllGems = async ( req, res, next ) =>
             { score: { $meta: 'textScore' } }
         ).limit( ITEM_PER_PAGE );
 
-        count = await Gem.countDocuments( filter );
+        count = await Gem.countDocuments( { $text: { $search: searchString } } );
 
         //enable partial search
         if ( gems.length === 0 )
@@ -226,7 +226,14 @@ const searchAllGems = async ( req, res, next ) =>
                     ]
             };
             gems = await Gem.find( filter, "name price imageUrls type" ).limit( ITEM_PER_PAGE );
-            count = await Gem.countDocuments( filter );
+            count = await Gem.countDocuments( {
+                "$or":
+                    [
+                        { name: regex },
+                        { type: regex },
+                        { cutType: regex }
+                    ]
+            } );
         }
 
 
