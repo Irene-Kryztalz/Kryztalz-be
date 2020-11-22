@@ -263,10 +263,7 @@ const removeUserPermission = async ( req, res, next ) =>
 
 };
 
-const getPermissions = ( req, res ) =>
-{
-    res.status( 200 ).json( permissions );
-};
+
 
 const getUser = async ( req, res, next ) =>
 {
@@ -292,7 +289,7 @@ const getUser = async ( req, res, next ) =>
             throwErr( error );
         }
 
-        res.status( 200 ).json( user );
+        res.status( 200 ).json( { user, permissions } );
 
     }
     catch ( error ) 
@@ -464,7 +461,6 @@ export
     deleteGem,
     getUser,
     postSignIn,
-    getPermissions,
     addUserPermission,
     removeUserPermission,
     getOverview
