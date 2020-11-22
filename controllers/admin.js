@@ -15,7 +15,6 @@ import { throwErr, catchErr, checkValidationErr, deleteFiles } from "../utils";
 
 const postGem = async ( req, res, next ) =>
 {
-    console.log( 77 );
     const images = req.files;
     const imageUrls = [];
     const imageIds = [];
