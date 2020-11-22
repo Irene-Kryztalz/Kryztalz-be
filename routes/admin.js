@@ -7,7 +7,6 @@ import
     deleteGem,
     getUser,
     getOverview,
-    getPermissions,
     addUserPermission,
     removeUserPermission,
     postSignIn,
@@ -85,7 +84,6 @@ router.post( "/user", checkAuth,
 
 router.put( "/add-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), addUserPermission );
 router.put( "/remove-permission", checkAuth, checkPermissions( permissions.EDIT_USER ), removeUserPermission );
-router.get( "/permissions", checkAuth, getPermissions );
 
 router.get( "/overview", checkAuth, getOverview );
 
