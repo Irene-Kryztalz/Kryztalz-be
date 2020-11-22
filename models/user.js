@@ -54,7 +54,7 @@ const userSchema = new Schema(
         roleId:
         {
             type: Number,
-            default: roles.NORMAL
+            default: roles.READ_ALL
         }
     }
 );
