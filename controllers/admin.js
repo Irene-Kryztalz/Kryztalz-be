@@ -231,6 +231,15 @@ const addUserPermission = async ( req, res, next ) =>
     {
         const userToEdit = await User.findById( id, "name email roleId" );
 
+        if ( !userToEdit )
+        {
+            const error =
+            {
+                message: "No user found"
+            };
+            throwErr( error );
+        }
+
         await userToEdit.addPerm( perms );
 
         res.json( userToEdit );
@@ -250,6 +259,15 @@ const removeUserPermission = async ( req, res, next ) =>
     try 
     {
         const userToEdit = await User.findById( id, "name email roleId" );
+
+        if ( !userToEdit )
+        {
+            const error =
+            {
+                message: "No user found"
+            };
+            throwErr( error );
+        }
 
         await userToEdit.removePerm( perms );
 
