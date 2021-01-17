@@ -15,7 +15,8 @@ const port = process.env.PORT || 7272,
     origin = process.env.ALLOWED_ORIGIN,
     cloudinary_name = process.env.CLOUDINARY_NAME,
     cloudinary_key = process.env.CLOUDINARY_API_KEY,
-    cloudinary_secret = process.env.CLOUDINARY_SECRET;
+    cloudinary_secret = process.env.CLOUDINARY_SECRET,
+    exchange = process.env.EXCHANGE;
 
 export
 {
@@ -31,5 +32,6 @@ export
     dbUrlTest,
     cloudinary_key,
     cloudinary_name,
-    cloudinary_secret
+    cloudinary_secret,
+    exchange
 };

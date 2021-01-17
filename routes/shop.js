@@ -10,7 +10,8 @@ import
     getOneGem,
     searchAllGems,
     removeFromWishList,
-    removeFromCart
+    removeFromCart,
+    getExchange
 }
     from "../controllers/shop";
 
@@ -26,5 +27,7 @@ router.get( "/search", searchAllGems );
 router.get( "/gems/filter", getAllFilteredGems );
 router.get( "/gems/:gemId", getOneGem );
 router.get( "/gems", getAllGems );
+
+router.get( "/rates", getExchange );
 
 export default router;

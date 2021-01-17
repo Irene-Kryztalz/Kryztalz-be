@@ -32,7 +32,7 @@ const userSchema = new Schema(
                     gemId:
                     {
                         type: Schema.Types.ObjectId,
-                        ref: "Gem"
+                        ref: "Gems"
                     },
                 }
             ],
@@ -43,7 +43,7 @@ const userSchema = new Schema(
                     gemId:
                     {
                         type: Schema.Types.ObjectId,
-                        ref: "Gem"
+                        ref: "Gems"
                     },
                     quantity: Number
                 }
