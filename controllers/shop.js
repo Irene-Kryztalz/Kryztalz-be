@@ -1,6 +1,8 @@
 import Gem from "../models/gem";
 import User from "../models/user";
 import { throwErr, catchErr } from "../utils";
+import { exchange } from "../config";
+import { get } from "https";
 
 const ITEM_PER_PAGE = 10;
 
@@ -249,13 +251,13 @@ const searchAllGems = async ( req, res, next ) =>
 
 const addToCart = async ( req, res, next ) =>
 {
-    const { productId, quantity } = req.body;
+    const { gemId, quantity } = req.body;
 
     try 
     {
-        const user = User.findById( req.userId, "cart" );
 
-        const gem = Gem.findById( productId );
+        const user = await User.findById( req.userId, "cart" );
+        const gem = await Gem.findById( gemId );
 
         if ( !gem )
         {
@@ -267,12 +269,26 @@ const addToCart = async ( req, res, next ) =>
             throwErr( error );
         }
 
-        user.cart = [ ...user.cart, { _id: productId, quantity } ];
+        const index = user.cart.findIndex( g =>
+            g.gemId.toString() === gemId );
+
+        if ( index > -1 )
+        {
+            user.cart[ index ].quantity += quantity;
+
+            if ( user.cart[ index ].quantity <= 0 )
+            {
+                user.cart = user.cart.filter( g => g.gemId.toString() !== gemId );
+            }
+        }
+        else
+        {
+            user.cart = [ ...user.cart, { gemId, quantity } ];
+        }
 
         await user.save();
 
-        res.json( user );
-
+        res.json( user.cart );
 
     }
     catch ( error ) 
@@ -283,12 +299,12 @@ const addToCart = async ( req, res, next ) =>
 
 const addToWishList = async ( req, res, next ) =>
 {
-    const { productId } = req.body;
+    const { gemId } = req.body;
 
     try 
     {
-        const user = User.findById( req.userId, "wishlist" );
-        const gem = Gem.findById( productId );
+        const user = await User.findById( req.userId, "wishlist" );
+        const gem = await Gem.findById( gemId );
 
         if ( !gem )
         {
@@ -300,11 +316,18 @@ const addToWishList = async ( req, res, next ) =>
             throwErr( error );
         }
 
-        user.wishlist = [ ...user.wishlist, { _id: productId } ];
+        const index = user.wishlist.findIndex( g =>
+            g.gemId.toString() === gemId );
+
+        if ( index < 0 )
+        {
+            user.wishlist = [ ...user.wishlist, { gemId } ];
+        }
+
 
         await user.save();
 
-        res.json( user );
+        res.json( user.wishlist );
 
 
     }
@@ -317,17 +340,17 @@ const addToWishList = async ( req, res, next ) =>
 
 const removeFromCart = async ( req, res, next ) =>
 {
-    const { productId } = req.body;
+    const { gemId } = req.body;
 
     try 
     {
-        const user = User.findById( req.userId, "cart" );
+        const user = await User.findById( req.userId, "cart" );
 
-        user.cart = [ ...user.cart ].filter( item => item._id.toString() !== productId );
+        user.cart = [ ...user.cart ].filter( item => item.gemId.toString() !== gemId );
 
         await user.save();
 
-        res.json( user );
+        res.json( user.cart );
 
 
     }
@@ -339,23 +362,63 @@ const removeFromCart = async ( req, res, next ) =>
 
 const removeFromWishList = async ( req, res, next ) =>
 {
-    const { productId } = req.body;
+    const { gemId } = req.body;
 
     try 
     {
-        const user = User.findById( req.userId, "wishlist" );
+        const user = await User.findById( req.userId, "wishlist" );
 
-        user.wishlist = [ ...user.wishlist ].filter( item => item._id.toString() !== productId );
+        user.wishlist = [ ...user.wishlist ].filter( item => item.gemId.toString() !== gemId );
 
         await user.save();
 
-        res.json( user );
+        res.json( user.wishlist );
 
     }
     catch ( error ) 
     {
         catchErr( error, next );
     }
+};
+
+const getExchange = async ( req, res, next ) =>
+{
+
+    get( `https://openexchangerates.org/api/latest.json?app_id=${ exchange }`, ratesJSON => 
+    {
+        let data = "";
+
+        ratesJSON.on( "data", chunk => 
+        {
+            data += chunk;
+        } );
+
+        ratesJSON.on( "end", () => 
+        {
+            const parsed = JSON.parse( data );
+
+            if ( parsed.error )
+            {
+                const error =
+                {
+                    message: parsed.message,
+                    statusCode: parsed.status
+                };
+
+                catchErr( error, next );
+                return;
+
+            }
+
+            res.json( parsed.rates );
+        } );
+    } ).on( "error", ( error ) =>
+    {
+        catchErr( error, next );
+    } );
+
+
+
 };
 
 export
@@ -367,5 +430,6 @@ export
     getOneGem,
     searchAllGems,
     removeFromCart,
-    removeFromWishList
+    removeFromWishList,
+    getExchange
 };

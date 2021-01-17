@@ -41,7 +41,11 @@ const postSignIn = async ( req, res, next ) =>
 
     try 
     {
-        const user = await User.findOne( { email: email.toLowerCase() } );
+        const user = await User.findOne( { email: email.toLowerCase() } )
+            .populate( "cart.gemId", '-imageIds' )
+            .populate( "wishlist.gemId", '-imageIds' )
+            .exec()
+            ;
         if ( !user || !user.isVerified )
         {
             const error =
