@@ -41,7 +41,7 @@ const generatePDF = async order =>
 
     const page = await browser.newPage();
 
-    await page.goto( `data:text/html;charset=UTF-8,${ html }`, {
+    await page.setContent( `${ html }`, {
         waitUntil: 'networkidle0'
     } );
 
