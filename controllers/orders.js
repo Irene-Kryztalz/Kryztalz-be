@@ -25,8 +25,6 @@ const generatePDF = async order =>
         return o;
     } );
 
-    console.log( order.items );
-
     order.amountDue = formatter.format( order.amountDue / order.rateToCurr );
     order.discount = formatter.format( order.discount / order.rateToCurr );
     order.total = formatter.format( order.total / order.rateToCurr );
@@ -302,10 +300,6 @@ const generateOrderInvoice = async ( req, res, next ) =>
             month: 'long',
             year: 'numeric'
         } );
-
-        order.total = order.total.toFixed( 2 );
-        order.discount = order.discount.toFixed( 2 );
-        order.amountDue = order.amountDue.toFixed( 2 );
 
         const [ buffer, /*html*/ ] = await generatePDF( order );
         //res.send( html );
