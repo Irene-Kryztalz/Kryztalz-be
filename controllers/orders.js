@@ -15,7 +15,22 @@ const generatePDF = async order =>
 
     const templateHtml = fs.readFileSync( path.join( __dirname, '../templates/invoice.html' ), 'utf8' );
     const template = handlebars.compile( templateHtml );
+    const formatter = new Intl.NumberFormat( 'en-NG' );
+
+    order.items = order.items.map( o => 
+    {
+        o.volumePrice = formatter.format( ( o.price * o.quantity / ( order.rateToCurr ) ) );
+        o.price = formatter.format( o.price / order.rateToCurr );
+
+        return o;
+    } );
+
+    order.amountDue = formatter.format( order.amountDue / order.rateToCurr );
+    order.discount = formatter.format( order.discount / order.rateToCurr );
+    order.total = formatter.format( order.total / order.rateToCurr );
+
     const html = template( order );
+
 
     const options =
     {
@@ -41,7 +56,7 @@ const generatePDF = async order =>
 
     const page = await browser.newPage();
 
-    await page.goto( `data:text/html;charset=UTF-8,${ html }`, {
+    await page.setContent( `${ html }`, {
         waitUntil: 'networkidle0'
     } );
 
@@ -97,7 +112,11 @@ const getOrders = async ( req, res, next ) =>
             orders = await Order.find( { userId: req.userId } ).sort( { _id: "desc" } ).limit( ITEM_PER_PAGE );
         }
 
-        res.json( orders );
+        const count = await Order.countDocuments( { userId: req.userId } );
+
+
+
+        res.json( { orders, count } );
     }
     catch ( error ) 
     {
@@ -280,27 +299,6 @@ const generateOrderInvoice = async ( req, res, next ) =>
             day: 'numeric',
             month: 'long',
             year: 'numeric'
-        } );
-
-        order.total = order.total.toFixed( 2 );
-        order.discount = order.discount.toFixed( 2 );
-        order.amountDue = order.amountDue.toFixed( 2 );
-
-        handlebars.registerHelper( "multiply", function ( ...args )
-        {
-
-            let prod = 1;
-            args.forEach( i => 
-            {
-                if ( +i )
-                {
-                    prod *= i;
-                }
-
-            } );
-
-
-            return prod.toFixed( 2 );
         } );
 
         const [ buffer, /*html*/ ] = await generatePDF( order );
