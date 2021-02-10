@@ -74,9 +74,9 @@ const getOneOrder = async ( req, res, next ) =>
 
     try 
     {
-        const order = await Order.findById( orderId );
+        const order = await Order.find( { _id: orderId, userId: req.userId } );
 
-        if ( !order )
+        if ( !order.length )
         {
             const error =
             {
@@ -86,7 +86,7 @@ const getOneOrder = async ( req, res, next ) =>
             throwErr( error );
         }
 
-        res.status( 200 ).json( order );
+        res.status( 200 ).json( order[ 0 ] );
     }
     catch ( error ) 
     {
@@ -279,11 +279,11 @@ const generateOrderInvoice = async ( req, res, next ) =>
 
     try 
     {
-        let order = await Order.findById( orderId )
+        let order = await Order.find( { _id: orderId, userId: req.userId } )
             .populate( "userId", "name email" )
             .exec();
 
-        if ( !order )
+        if ( !order.length )
         {
             const error =
             {
@@ -293,7 +293,7 @@ const generateOrderInvoice = async ( req, res, next ) =>
             throwErr( error );
         }
 
-        order = JSON.parse( JSON.stringify( order ) );
+        order = JSON.parse( JSON.stringify( order[ 0 ] ) );
 
         order.orderedAt = new Date( order.orderedAt ).toLocaleDateString( 'en-GB', {
             day: 'numeric',

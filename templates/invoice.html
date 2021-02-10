@@ -89,6 +89,19 @@
                 font-size: 1.5rem;
             }
 
+            .desc-header {
+                display: inline-block;
+                border-bottom: 2px solid rgb(255, 111, 206);
+                margin: 10px auto;
+            }
+
+            .description {
+                margin-top: 10px auto;
+                font-weight: normal;
+                font-size: 1.2rem;
+                padding-bottom: 10px;
+            }
+
             .order-list {
                 border-collapse: collapse;
                 width: 100%;
@@ -190,6 +203,11 @@
 
                     <br />
                     <br />
+
+                    <h3 class="desc-header">Description:</h3>
+                    <p class="description">
+                        {{description}}
+                    </p>
 
                     <p>Order Date : {{orderedAt}}</p>
 
